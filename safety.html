@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>SMS Safety Check</title>
+<link rel="icon" type="image/png" href="logo1.png">
+<link rel="stylesheet" href="safety.css">
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+</head>
+
+<body>
+
+<header>
+
+<div class="logo-box">
+<img src="logo.png" class="logo">
+</div>
+
+<nav class="nav-links" id="navLinks">
+
+<a href="main.html">Home</a>
+<a href="hazard.html">Hazards</a>
+<a href="safety.html">SMS Safety</a>
+<a href="fuel.html">Fuel & Route</a>
+
+</nav>
+
+<div class="menu-icon" id="menuIcon">
+<i class="fas fa-bars"></i>
+</div>
+
+</header>
+
+<div class="container">
+
+<div class="title">
+
+<h1>SMS SAFETY CHECK</h1>
+
+<p>Stay Safe. Check-in Regularly.</p>
+
+</div>
+
+<!-- Tabs -->
+
+<div class="tabs">
+
+<button class="tab active" id="checkTab">CHECK-IN</button>
+
+<button class="tab" id="statusTab">STATUS</button>
+
+<button class="tab" id="historyTab">HISTORY</button>
+
+</div>
+
+<!-- ================= CHECK SECTION ================= -->
+
+<div id="checkSection">
+
+<div class="card">
+
+<h3>REGISTERED MOBILE NUMBER</h3>
+
+<div class="mobile-box">
+
+<div>
+
+<i class="fa-solid fa-mobile-screen-button"></i>
+
+<span id="mobileNumber">Not Registered</span>
+
+</div>
+
+<span class="verified">Verified</span>
+
+</div>
+
+</div>
+
+<div class="card">
+
+<h3>QUICK CHECK-IN</h3>
+
+<p>Tap the button to check-in and share your current status.</p>
+
+<button class="check-btn" id="checkBtn">
+
+<i class="fa-solid fa-shield-heart"></i>
+
+CHECK-IN NOW
+
+</button>
+
+</div>
+
+<div class="card">
+
+<h3>EMERGENCY OPTIONS</h3>
+
+<p>In case of emergency send SOS Alert.</p>
+
+<button class="sos-btn" id="sosBtn">
+
+<i class="fa-solid fa-triangle-exclamation"></i>
+
+SEND SOS ALERT
+
+</button>
+
+<button class="location-btn" id="shareBtn">
+
+<i class="fa-solid fa-location-dot"></i>
+
+SHARE LOCATION
+
+</button>
+
+</div>
+
+</div>
+
+<!-- ================= STATUS SECTION ================= -->
+
+<div id="statusSection" style="display:none;">
+
+<div class="card">
+
+<h3>CURRENT STATUS</h3>
+
+<div class="status">
+
+<div class="status-icon">
+
+<i class="fa-solid fa-shield-halved"></i>
+
+</div>
+
+<div>
+
+<h2 id="statusText">SAFE</h2>
+
+<p id="statusTime">Last Check-in : --</p>
+
+</div>
+
+</div>
+
+<table>
+
+<tr>
+<td>Name</td>
+<td id="userName">Not Registered</td>
+</tr>
+
+<tr>
+<td>Location</td>
+<td id="locationName">Waiting...</td>
+</tr>
+
+<tr>
+<td>Mobile</td>
+<td id="mobileDisplay">-</td>
+</tr>
+
+
+<tr>
+
+</table>
+
+</div>
+
+</div>
+
+<!-- ================= HISTORY SECTION ================= -->
+
+<div id="historySection" style="display:none;">
+
+<div class="card">
+
+<h3>CHECK-IN HISTORY</h3>
+
+<ul id="historyList">
+
+<li>No Check-in Available</li>
+
+</ul>
+
+</div>
+
+</div>
+
+</div>
+
+<script src="safety.js"></script>
+
+</body>
+</html>

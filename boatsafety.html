@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Boat Safety</title>
+    <link rel="icon" type="image/png" href="logo1.png">
+    <style>
+        * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Poppins, sans-serif;
+}
+
+body {
+    background: #041826;
+    color: white;
+    min-height: 100vh;
+}
+
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 25px;
+    background: #06263d;
+}
+
+.logo {
+    width: 70px;
+}
+
+.nav-links {
+    display: flex;
+    gap: 20px;
+}
+
+.nav-links a {
+    color: white;
+    text-decoration: none;
+}
+
+.menu-icon {
+    display: none;
+    font-size: 32px;
+    cursor: pointer;
+}
+
+.container {
+    width: 95%;
+    max-width: 1200px;
+    margin: 30px auto;
+}
+
+.title {
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+.title h1 {
+    font-size: 38px;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: 1fr 320px;
+    gap: 25px;
+}
+
+.card {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 18px;
+    padding: 25px;
+}
+
+.section {
+    margin-bottom: 22px;
+}
+
+.section h3 {
+    color: #4fc3f7;
+    margin-bottom: 12px;
+}
+
+.check-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.check-item input {
+    width: 20px;
+    height: 20px;
+    accent-color: #00e676;
+}
+
+.progress-circle {
+    width: 180px;
+    height: 180px;
+    border-radius: 50%;
+    border: 12px solid #00e676;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0 auto 20px;
+    font-size: 42px;
+    font-weight: bold;
+}
+
+.status-box {
+    background: rgba(0, 230, 118, 0.12);
+    border: 1px solid rgba(0, 230, 118, 0.25);
+    border-radius: 12px;
+    padding: 16px;
+    margin-top: 18px;
+    text-align: center;
+}
+
+.status-box h3 {
+    color: #00e676;
+    margin-bottom: 8px;
+}
+
+.crew {
+    margin-top: 18px;
+}
+
+.crew-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 12px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.btns {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 12px;
+    margin-top: 22px;
+}
+
+button {
+    padding: 14px;
+    border: none;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.primary {
+    background: #0077ff;
+    color: white;
+}
+
+.secondary {
+    background: #263238;
+    color: white;
+}
+
+.success {
+    background: #00c853;
+    color: white;
+}
+.bt{
+    background: #62a9fb;
+    color: white;
+    width: 100%;
+}
+.bt:hover{
+    background: #0077ff;
+}
+@media (max-width: 900px) {
+    .grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+
+    .menu-icon {
+        display: block;
+    }
+
+    .nav-links {
+        position: fixed;
+        top: 0;
+        right: -260px;
+        width: 260px;
+        height: 100vh;
+        background: #003366;
+        flex-direction: column;
+        align-items: center;
+        padding-top: 90px;
+        transition: 0.4s;
+        z-index: 1000;
+    }
+
+    .nav-links.active {
+        right: 0;
+    }
+
+    .btns {
+        grid-template-columns: 1fr;
+    }
+
+    .title h1 {
+        font-size: 30px;
+    }
+}
+    </style>
+</head>
+<body>
+    <div class="">
+        <div class="title"> <h1>🚤 Boat Safety & Checklist</h1>  
+        </div>
+        <div class="grid"> 
+        <div class="card">
+        <div class="section">
+             <h3>Engine & Fuel</h3> 
+            <label class="check-item">
+            <input type="checkbox" class="check" checked>Fuel checked</label>
+             <label class="check-item">
+            <input type="checkbox" class="check" checked>Engine oil checked</label>
+             <label class="check-item">
+            <input type="checkbox" class="check" checked>Battery charged</label>
+             <label class="check-item">
+            <input type="checkbox" class="check">Spare fuel available</label>
+         </div>
+         <div class="section"> 
+            <h3>Navigation</h3>
+             <label class="check-item">
+            <input type="checkbox" class="check" checked>GPS working</label> 
+            <label class="check-item">
+            <input type="checkbox" class="check" checked>NavIC signal available</label>
+             <label class="check-item">
+                <input type="checkbox" class="check" checked>Compass available</label>
+              <label class="check-item">
+                <input type="checkbox" class="check" checked>Route downloaded offline</label> 
+            </div> 
+             <div class="section"> 
+                <h3>Communication</h3> 
+                <label class="check-item">
+                <input type="checkbox" class="check" checked>Mobile charged</label>
+                 <label class="check-item">
+                <input type="checkbox" class="check" checked>SOS system tested</label>
+                 <label class="check-item">
+                <input type="checkbox" class="check" checked>Emergency contacts saved</label>
+                 <label class="check-item">
+                <input type="checkbox" class="check">VHF radio available</label> 
+            </div>
+            <div class="section">
+                 <h3>Safety Equipment</h3> <label class="check-item">
+                    <input type="checkbox" class="check" checked>Life jackets for all crew</label>
+                 <label class="check-item">
+                    <input type="checkbox" class="check" checked>First aid kit</label> 
+                <label class="check-item">
+                    <input type="checkbox" class="check">Fire extinguisher</label>
+                 <label class="check-item">
+                    <input type="checkbox" class="check" checked>Torch / emergency light</label>
+                 </div>
+             <div class="section">
+                 <h3>Food & Water</h3> 
+                <label class="check-item">
+                    <input type="checkbox" class="check" checked>Drinking water</label> 
+                <label class="check-item">
+                    <input type="checkbox" class="check" checked>Food for 24 hours</label> 
+                <label class="check-item">
+                    <input type="checkbox" class="check" checked>Extra medicines</label> 
+                <label class="check-item">
+                    <input type="checkbox" class="check">Weather-appropriate clothing</label> 
+            </div>
+                 <div class="btns">
+                     <button class="secondary" onclick="resetChecklist()">Reset</button> 
+                    <button class="primary" onclick="saveChecklist()">Save</button>
+                     <button class="success" onclick="readyToSail()">Ready to Fishing</button> 
+                     <a href="main.html">
+                        <button type="button" class="bt">back</button>
+                    </a>
+
+                </div> 
+            </div>
+            
+            <div class="card"> 
+                <div class="progress-circle" id="progressCircle">92%</div>
+                <div class="status-box"> 
+                    <h3>Departure Status</h3> 
+                    <p id="statusText">⚠ Not Recommended</p> 
+                </div>
+            </div>    
+      </div>
+      <script> const checks=document.querySelectorAll(".check");
+       function updateProgress(){
+        const total=checks.length;
+        const checked=[...checks].filter(c=>c.checked).length;
+        const percent=Math.round((checked/total)*100); 
+        document.getElementById("progressCircle").innerText=percent+"%"; 
+        document.getElementById("statusText").innerText=percent>=95?"✅ Ready for Departure":"⚠ Not Recommended"; 
+        } 
+        checks.forEach(c=>c.addEventListener("change",updateProgress)); 
+        function resetChecklist(){
+            checks.forEach(c=>c.checked=false);
+            updateProgress()
+            }
+        function saveChecklist(){
+            alert("Checklist saved successfully.")
+            }
+        function readyToSail(){
+            const percent=parseInt(document.getElementById("progressCircle").innerText);
+            if(percent>=95){
+                alert("Boat is ready to sail safely!")
+                window.location.href="main.html";
+            }
+            else{alert("Complete all safety items before departure.")}
+            } 
+        updateProgress(); 
+        const menuIcon=document.getElementById("menuIcon"); 
+        const navLinks=document.getElementById("navLinks"); 
+        menuIcon.onclick=()=>navLinks.classList.toggle("active"); 
+        </script>
+</body>
+</html>

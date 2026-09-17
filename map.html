@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fishers </title>
+    <link rel="icon" type="image/png" href="logo1.png">
+    <link rel="stylesheet" href="map.css">
+    <link rel="stylesheet"
+          href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+
+</head>
+<body>
+    <header>
+        <img src="logo.png" alt="" class="logo">
+        <nav class="nav-links" id="navLinks">
+            <a href="main.html">Home</a>
+            <a href="weather.html">Weather</a>
+            <a href="alert.html">Alert</a>
+            <a href="map.html">Map</a>
+            <a href="sms.html">SOS system</a>
+            <a href="scheme.html">Government Schemes</a>
+        </nav>
+        <div class="menu-icon" id="menuIcon">☰</div>
+    </header>
+    <div class="container">
+
+    <h1>🗺 GPS Tracking & Navigation</h1>
+
+    <div class="top-cards">
+
+        <div class="card">
+            <h3>📍 Latitude</h3>
+            <p id="lat">Loading...</p>
+        </div>
+
+        <div class="card">
+            <h3>📍 Longitude</h3>
+            <p id="lon">Loading...</p>
+        </div>
+
+        <div class="card">
+            <h3>🚤 Boat Status</h3>
+            <p>Tracking Active</p>
+        </div>
+
+        <div class="card">
+            <h3>🌊 Sea Condition</h3>
+            <p>SAFE</p>
+        </div>
+
+    </div>
+
+    <div class="map-box">
+
+        <h2>Live Navigation Map</h2>
+
+        <div id="map">
+            MAP AREA
+        </div>
+
+    </div>
+
+    <div class="bottom">
+
+        <div class="info-card">
+            <h3>📅 Date</h3>
+            <p id="date"></p>
+        </div>
+
+        <div class="info-card">
+            <h3>🕒 Time</h3>
+            <p id="time"></p>
+        </div>
+
+    </div>
+
+</div>
+
+<script
+src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js">
+</script>
+<script src="map.js"></script>
+
+</body>
+</html>

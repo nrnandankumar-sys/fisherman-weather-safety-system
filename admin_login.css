@@ -1,0 +1,550 @@
+/* =========================================================
+   ADMIN LOGIN PAGE
+   ========================================================= */
+
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+
+/* =========================================================
+   RESET
+   ========================================================= */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+}
+
+
+/* =========================================================
+   BODY
+   ========================================================= */
+
+body {
+    min-height: 100vh;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    position: relative;
+    overflow: hidden;
+
+    background:
+        linear-gradient(
+            135deg,
+            #03141c,
+            #062c3b,
+            #07506a,
+            #03141c
+        );
+}
+
+
+/* =========================================================
+   BACKGROUND EFFECTS
+   ========================================================= */
+
+body::before {
+    content: "";
+    position: absolute;
+
+    width: 380px;
+    height: 380px;
+
+    top: -150px;
+    left: -120px;
+
+    border-radius: 50%;
+
+    background: #00e5ff;
+    opacity: 0.18;
+
+    filter: blur(10px);
+
+    animation: floatingOne 7s ease-in-out infinite;
+}
+
+
+body::after {
+    content: "";
+    position: absolute;
+
+    width: 420px;
+    height: 420px;
+
+    right: -160px;
+    bottom: -180px;
+
+    border-radius: 50%;
+
+    background: #00c853;
+    opacity: 0.15;
+
+    filter: blur(10px);
+
+    animation: floatingTwo 8s ease-in-out infinite;
+}
+
+
+/* =========================================================
+   LOGIN CONTAINER
+   ========================================================= */
+
+.login-container {
+    position: relative;
+    z-index: 2;
+
+    width: 400px;
+
+    padding: 40px 38px;
+
+    background: rgba(255, 255, 255, 0.10);
+
+    border: 1px solid rgba(255, 255, 255, 0.20);
+
+    border-radius: 22px;
+
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+
+    box-shadow:
+        0 20px 50px rgba(0, 0, 0, 0.45),
+        0 0 25px rgba(0, 229, 255, 0.10);
+
+    animation: fadeIn 0.8s ease;
+}
+
+
+/* =========================================================
+   ADMIN ICON
+   ========================================================= */
+
+.admin-icon {
+    width: 90px;
+    height: 90px;
+
+    margin: 0 auto 18px;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    font-size: 48px;
+
+    border-radius: 50%;
+
+    background: rgba(0, 229, 255, 0.12);
+
+    border: 2px solid rgba(0, 229, 255, 0.45);
+
+    box-shadow:
+        0 0 20px rgba(0, 229, 255, 0.25),
+        inset 0 0 15px rgba(0, 229, 255, 0.08);
+
+    animation: iconGlow 2.5s ease-in-out infinite;
+}
+
+
+/* =========================================================
+   HEADING
+   ========================================================= */
+
+.login-container h2 {
+    text-align: center;
+
+    color: #ffffff;
+
+    font-size: 30px;
+    font-weight: 600;
+
+    margin-bottom: 28px;
+
+    letter-spacing: 0.5px;
+
+    text-shadow:
+        0 0 10px rgba(0, 229, 255, 0.35);
+}
+
+
+/* =========================================================
+   FORM
+   ========================================================= */
+
+#adminLoginForm {
+    width: 100%;
+}
+
+
+/* =========================================================
+   INPUT FIELDS
+   ========================================================= */
+
+#adminLoginForm input {
+    width: 100%;
+
+    height: 52px;
+
+    margin-bottom: 18px;
+
+    padding: 0 16px;
+
+    outline: none;
+
+    border-radius: 11px;
+
+    border: 1px solid rgba(255, 255, 255, 0.22);
+
+    background: rgba(255, 255, 255, 0.10);
+
+    color: #ffffff;
+
+    font-size: 15px;
+
+    transition: 0.3s ease;
+}
+
+
+#adminLoginForm input::placeholder {
+    color: rgba(255, 255, 255, 0.70);
+}
+
+
+#adminLoginForm input:focus {
+    border-color: #00e5ff;
+
+    background: rgba(0, 229, 255, 0.08);
+
+    box-shadow:
+        0 0 10px rgba(0, 229, 255, 0.25),
+        inset 0 0 8px rgba(0, 229, 255, 0.05);
+}
+
+
+#adminLoginForm input:hover {
+    border-color: rgba(0, 229, 255, 0.55);
+}
+
+
+/* =========================================================
+   LOGIN BUTTON
+   ========================================================= */
+
+#adminLoginForm button[type="submit"] {
+    width: 100%;
+
+    height: 52px;
+
+    margin-top: 5px;
+
+    border: none;
+
+    border-radius: 11px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #00bfa5,
+            #00c853
+        );
+
+    color: #ffffff;
+
+    font-size: 17px;
+
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition: 0.3s ease;
+
+    box-shadow:
+        0 8px 20px rgba(0, 200, 83, 0.25);
+}
+
+
+#adminLoginForm button[type="submit"]:hover {
+    transform: translateY(-2px);
+
+    background:
+        linear-gradient(
+            135deg,
+            #00d4b8,
+            #00e676
+        );
+
+    box-shadow:
+        0 10px 25px rgba(0, 230, 118, 0.35);
+}
+
+
+#adminLoginForm button[type="submit"]:active {
+    transform: scale(0.98);
+}
+
+
+#adminLoginForm button[type="submit"]:disabled {
+    opacity: 0.65;
+
+    cursor: not-allowed;
+
+    transform: none;
+
+    box-shadow: none;
+}
+
+
+/* =========================================================
+   FISHERMAN LOGIN LINK
+   ========================================================= */
+
+.login-container > a:first-of-type {
+    display: block;
+
+    margin-top: 22px;
+
+    text-align: center;
+
+    color: #00e5ff;
+
+    font-size: 14px;
+
+    font-weight: 500;
+
+    text-decoration: none;
+
+    transition: 0.3s ease;
+}
+
+
+.login-container > a:first-of-type:hover {
+    color: #ffffff;
+
+    text-decoration: underline;
+
+    text-shadow:
+        0 0 8px rgba(0, 229, 255, 0.6);
+}
+
+
+/* =========================================================
+   BACK BUTTON
+   ========================================================= */
+
+.login-container > a:last-of-type {
+    display: block;
+
+    margin-top: 15px;
+
+    text-align: center;
+
+    text-decoration: none;
+}
+
+
+.bt {
+    width: 100%;
+
+    height: 45px;
+
+    border: 1px solid rgba(255, 255, 255, 0.20);
+
+    border-radius: 10px;
+
+    background: rgba(96, 109, 224, 0.75);
+
+    color: #ffffff;
+
+    font-size: 14px;
+
+    font-weight: 500;
+
+    cursor: pointer;
+
+    transition: 0.3s ease;
+}
+
+
+.bt:hover {
+    background: #4141ee;
+
+    transform: translateY(-2px);
+
+    box-shadow:
+        0 8px 18px rgba(65, 65, 238, 0.30);
+}
+
+
+.bt:active {
+    transform: scale(0.98);
+}
+
+
+/* =========================================================
+   INPUT AUTOFILL
+   ========================================================= */
+
+#adminLoginForm input:-webkit-autofill,
+#adminLoginForm input:-webkit-autofill:hover,
+#adminLoginForm input:-webkit-autofill:focus {
+    -webkit-text-fill-color: #ffffff;
+
+    transition:
+        background-color 5000s ease-in-out 0s;
+}
+
+
+/* =========================================================
+   ANIMATIONS
+   ========================================================= */
+
+@keyframes fadeIn {
+
+    from {
+        opacity: 0;
+        transform: translateY(-25px) scale(0.97);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+
+}
+
+
+@keyframes iconGlow {
+
+    0%,
+    100% {
+        box-shadow:
+            0 0 15px rgba(0, 229, 255, 0.20),
+            inset 0 0 10px rgba(0, 229, 255, 0.05);
+    }
+
+    50% {
+        box-shadow:
+            0 0 30px rgba(0, 229, 255, 0.40),
+            inset 0 0 15px rgba(0, 229, 255, 0.10);
+    }
+
+}
+
+
+@keyframes floatingOne {
+
+    0%,
+    100% {
+        transform: translate(0, 0);
+    }
+
+    50% {
+        transform: translate(30px, 25px);
+    }
+
+}
+
+
+@keyframes floatingTwo {
+
+    0%,
+    100% {
+        transform: translate(0, 0);
+    }
+
+    50% {
+        transform: translate(-25px, -30px);
+    }
+
+}
+
+
+/* =========================================================
+   TABLET
+   ========================================================= */
+
+@media (max-width: 768px) {
+
+    .login-container {
+        width: 90%;
+        max-width: 400px;
+
+        padding: 35px 28px;
+    }
+
+}
+
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 480px) {
+
+    body {
+        padding: 20px;
+    }
+
+    .login-container {
+        width: 100%;
+
+        padding: 30px 22px;
+
+        border-radius: 18px;
+    }
+
+    .admin-icon {
+        width: 75px;
+        height: 75px;
+
+        font-size: 40px;
+    }
+
+    .login-container h2 {
+        font-size: 25px;
+
+        margin-bottom: 22px;
+    }
+
+    #adminLoginForm input {
+        height: 48px;
+
+        font-size: 14px;
+    }
+
+    #adminLoginForm button[type="submit"] {
+        height: 48px;
+
+        font-size: 16px;
+    }
+
+    .bt {
+        height: 43px;
+    }
+
+}
+
+
+/* =========================================================
+   VERY SMALL MOBILE
+   ========================================================= */
+
+@media (max-width: 350px) {
+
+    .login-container {
+        padding: 25px 18px;
+    }
+
+    .admin-icon {
+        width: 65px;
+        height: 65px;
+
+        font-size: 34px;
+    }
+
+    .login-container h2 {
+        font-size: 22px;
+    }
+
+}

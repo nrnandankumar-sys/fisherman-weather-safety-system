@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SEA RAKSHA</title>
+    <link rel="icon" type="image/png" href="logo1.png">
+    <link rel="stylesheet" href="main.css">
+    <link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+</head>
+<body>
+    <header>
+        <img src="logo.png" alt="" class="logo">
+        <h1 id="welcome"></h1>
+        <nav class="nav-links" id="navLinks">
+            <a href="admin_login.html" >Admin</a>
+            <a href="main.html">Home</a>
+            <a href="weather.html">Weather</a>
+            <a href="alert.html">Alert</a>
+            <a href="map.html">Map</a>
+            <a href="sms.html">SOS system</a>
+            <a href="scheme.html">Government Schemes</a>
+            <a href="hazard.html" id="hazardLink">Hazard</a>
+            <a href="safety.html" id="smsLink">SmS Safety</a>
+            <a href="fuel.html" id="fuelLink">Fuel & Route</a>
+        </nav>
+        <a href="index.html" id="loginBtn" class="login-btn">Login</a>
+<button id="logoutBtn" class="logout-btn">
+    Logout
+</button>
+        <div class="menu-icon" id="menuIcon">☰</div>
+    </header>
+     <div class="main">
+      <button id="sos">🚨 Emergency SOS</button>
+    <div class="hero">
+      <h1>
+        SEA RAKSHA
+      </h1>
+      <p>
+        Real-time weather monitoring for fishermen safety
+      </p>
+    </div>
+    <div class="cards">
+      <a href="https://www.kisandeals.com/mandiprices/FISH/ALL/ALL" class="fis" target="_blank">Market Rate</a>
+      <a href="boatsafety.html" class="fis">Boat Safety & Checklist</a>
+    </div>    
+    <div class="status-card card">
+
+    <h3>Emergency Status</h3>
+
+    <p id="statusText">No Emergency</p>
+
+</div>
+    <div class="cards">
+      <div class="card">
+        <h3>📍 Location</h3>
+        <p id="location">Loading...</p>
+      </div>
+      <div class="card">
+        <h3>🌡 Temperature</h3>
+        <p id="temp">Loading...</p>
+      </div>
+
+      <div class="card">
+        <h3>🌥 Weather</h3>
+        <p id="weather">Loading...</p>
+      </div>
+
+      <div class="card">
+        <h3>💨 Wind Speed</h3>
+        <p id="wind">Loading...</p>
+      </div>
+
+      <div class="card">
+        <h3>🌊 Sea Status</h3>
+        <p id="status">SAFE</p>
+      </div>
+
+    </div>
+    </div>
+    <h2 style="display: flex; align-items: center; justify-content: center; background-color: rgba(221, 214, 214, 0.1);;">5-Day Weather Forecast</h2>
+
+    <div id="forecast"></div>
+    
+
+<script src="fd.js"></script>
+  <script type="module" src="main.js"></script>
+  <script type="module" src="user.js"></script>
+  <script>
+
+</script>
+</body>
+<footer>
+  <h1 id="welcome"> Emergency Contacts</h1>
+  <div class="emergency-container">
+
+    <div class="card">
+        <h3>🚨 National Emergency</h3>
+        <p>112</p>
+        <a href="tel:112">Call Now</a>
+    </div>
+
+    <div class="card">
+        <h3>🌊 Coast Guard</h3>
+        <p>1554</p>
+        <a href="tel:1554">Call Now</a>
+    </div>
+
+    <div class="card">
+        <h3>🚓 Police</h3>
+        <p>100</p>
+        <a href="tel:100">Call Now</a>
+    </div>
+
+    <div class="card">
+        <h3>🚑 Ambulance</h3>
+        <p>108</p>
+        <a href="tel:108">Call Now</a>
+    </div>
+
+    <div class="card">
+        <h3>🔥 Fire Service</h3>
+        <p>101</p>
+        <a href="tel:101">Call Now</a>
+    </div>
+
+</div>
+    <p>
+        © 2026 Fisherman Weather Detection System
+    </p>
+
+   
+</footer>
+</html>

@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+<link rel="icon" type="image/png" href="logo1.png">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Admin Dashboard</title>
+
+<link rel="stylesheet" href="admin_dashboard.css">
+
+</head>
+
+<body>
+
+<div class="container">
+
+<div class="header">
+
+<h2>SEA RAKSHA ADMIN DASHBOARD</h2>
+
+<div>
+
+<button class="tab-btn active" id="alertTab">
+Emergency Alerts
+</button>
+
+<button class="tab-btn" id="userTab">
+Registered Fishermen
+</button>
+
+<button class="logout-btn" onclick="logout()">
+Logout
+</button>
+
+</div>
+
+</div>
+
+
+<div id="alertSection">
+
+<h3>Emergency Alerts</h3>
+
+<table>
+
+<thead>
+
+<tr>
+
+<th>Name</th>
+<th>Phone</th>
+<th>Location</th>
+<th>Latitude</th>
+<th>Longitude</th>
+<th>Time</th>
+<th>Status</th>
+<th>Action</th>
+
+</tr>
+
+</thead>
+
+<tbody id="alertTable">
+
+</tbody>
+
+</table>
+
+</div>
+
+
+<div id="userSection" style="display:none;">
+
+<h3>Registered Fishermen</h3>
+
+<table>
+
+<thead>
+
+<tr>
+
+<th>Name</th>
+<th>Phone</th>
+<th>Email</th>
+<th>Location</th>
+<th>Latitude</th>
+<th>Longitude</th>
+<th>Registered Time</th>
+<th>Action</th>
+
+</tr>
+
+</thead>
+
+<tbody id="userTable">
+
+</tbody>
+
+</table>
+
+</div>
+
+</div>
+
+<script type="module" src="admin_dashboard.js"></script>
+
+</body>
+
+</html>

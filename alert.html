@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fishers </title>
+    <link rel="icon" type="image/png" href="logo1.png">
+    <link rel="stylesheet" href="alert.css">
+</head>
+<body>
+    <header>
+        <img src="logo.png" alt="" class="logo">
+        <nav class="nav-links" id="navLinks">
+            <a href="main.html">Home</a>
+            <a href="weather.html">Weather</a>
+            <a href="alert.html">Alert</a>
+            <a href="map.html">Map</a>
+            <a href="sms.html">SOS system</a>
+            <a href="scheme.html">Government Schemes</a>
+        </nav>
+        <div class="menu-icon" id="menuIcon">☰</div>
+
+    </header>
+    <div class="container">
+
+    <h1>⚠ Weather Alert System</h1>
+
+    <div class="search-box">
+
+        <input
+        type="text"
+        id="city"
+        placeholder="Enter City Name">
+
+        <button onclick="getAlerts()">
+        Check Alerts
+        </button>
+
+    </div>
+
+    <div class="alert-card">
+
+        <h2 id="alertTitle">
+        Loading...
+        </h2>
+
+        <p id="alertMessage">
+        Checking weather condition...
+        </p>
+
+    </div>
+
+
+    <!-- Weather Details -->
+
+    <div class="details">
+
+        <div class="card">
+            <h3>🌡 Temperature</h3>
+            <p id="temp">--</p>
+        </div>
+
+        <div class="card">
+            <h3>💨 Wind Speed</h3>
+            <p id="wind">--</p>
+        </div>
+
+        <div class="card">
+            <h3>🌧 Weather</h3>
+            <p id="weather">--</p>
+        </div>
+
+    </div>
+
+</div>
+
+<script src="alert.js"></script>
+</body>
+</html>

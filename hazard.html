@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Crowdsourced Hazard Layer</title>
+
+<link rel="stylesheet" href="hazard.css">
+<link rel="icon" type="image/png" href="logo1.png">
+<link rel="stylesheet"
+href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+
+</head>
+
+<body>
+<header>
+
+<div class="logo-box">
+    <img src="logo.png" class="logo">
+</div>
+
+<nav class="nav-links" id="navLinks">
+
+    <a href="main.html">Home</a>
+    <a href="hazard.html">Hazards</a>
+    <a href="safety.html">SMS Safety</a>
+    <a href="fuel.html">Fuel & Route</a>
+
+</nav>
+
+<div class="menu-icon" id="menuIcon">
+
+☰
+
+</div>
+
+</header>
+
+<div class="container">
+
+<div class="heading">
+
+<h1>CROWDSOURCED HAZARD LAYER</h1>
+
+<p>
+
+Add and view real-time hazards reported by local fishermen
+
+</p>
+
+</div>
+
+<div class="map-card">
+
+    <div class="legend">
+
+        <h3>Hazards</h3>
+
+        <div class="legend-item">
+
+        <span class="red"></span>
+
+        Hidden Rocks
+
+        </div>
+
+        <div class="legend-item">
+
+        <span class="orange"></span>
+
+        Rogue Nets
+
+        </div>
+
+        <div class="legend-item">
+
+        <span class="yellow"></span>
+
+        High Waves
+
+        </div>
+
+        <div class="legend-item">
+
+        <span class="blue"></span>
+
+        Strong Currents
+
+        </div>
+
+        <div class="legend-item">
+
+        <span class="green"></span>
+
+        Safe Area
+
+        </div>
+    </div>
+
+    <div id="map"></div>
+
+</div>
+
+<div class="grid">
+
+<div class="card">
+
+<h2>
+
+<i class="fa-solid fa-triangle-exclamation"></i>
+
+Report New Hazard
+
+</h2>
+
+<div class="input-box">
+
+<label>Hazard Type</label>
+
+<select id="hazardType">
+
+<option>Hidden Rock</option>
+
+<option>Rogue Nets</option>
+
+<option>High Waves</option>
+
+<option>Strong Current</option>
+
+<option>Safe Area</option>
+
+</select>
+
+</div>
+
+<div class="input-box">
+
+<label>Description</label>
+
+<textarea
+id="description"
+placeholder="Describe the hazard"></textarea>
+
+</div>
+
+<div class="input-box">
+
+<label>Location</label>
+
+<input
+type="text"
+id="location"
+placeholder="Current Location">
+
+</div>
+
+<div class="input-box">
+
+<label>Upload Photo</label>
+
+<input
+type="file"
+id="photo"
+accept="image/*">
+
+</div>
+
+<div class="btn-group">
+
+<button id="locationBtn">
+
+<i class="fa-solid fa-location-crosshairs"></i>
+
+Use My Location
+
+</button>
+
+<button id="submitBtn">
+
+<i class="fa-solid fa-paper-plane"></i>
+
+Submit Hazard
+
+</button>
+
+</div>
+
+</div>
+
+<div class="card">
+
+<h2>
+
+<i class="fa-solid fa-clock-rotate-left"></i>
+
+Recent Hazards
+
+</h2>
+
+<div id="hazardList">
+
+<div class="hazard-item">
+
+<div>
+
+<h3>Hidden Rock</h3>
+
+<p>Near Lighthouse Area</p>
+
+</div>
+
+<span class="time">
+
+10:30 AM
+
+</span>
+
+</div>
+
+<div class="hazard-item">
+
+<div>
+
+<h3>Strong Current</h3>
+
+<p>Harbour Entrance</p>
+
+</div>
+
+<span class="time">
+
+09:20 AM
+
+</span>
+
+</div>
+
+<div class="hazard-item">
+
+<div>
+
+<h3>High Waves</h3>
+
+<p>Deep Sea Zone</p>
+
+</div>
+
+<span class="time">
+
+Yesterday
+
+</span>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<script type="module" src="hazard1.js"></script>
+
+</body>
+</html>

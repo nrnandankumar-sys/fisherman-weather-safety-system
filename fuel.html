@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Smart Fuel & Route Optimizer</title>
+
+<link rel="stylesheet" href="fuel.css">
+<link rel="icon" type="image/png" href="logo1.png">
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+<link rel="stylesheet"
+href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+
+</head>
+
+<body>
+
+<header>
+
+<div class="logo-box">
+<img src="logo.png" class="logo">
+</div>
+
+<nav class="nav-links" id="navLinks">
+
+<a href="main.html">Home</a>
+<a href="hazard.html">Hazards</a>
+<a href="safety.html">SMS Safety</a>
+<a href="fuel.html">Fuel & Route</a>
+
+</nav>
+
+<div class="menu-icon" id="menuIcon">
+<i class="fas fa-bars"></i>
+</div>
+
+</header>
+
+<div class="container">
+
+<div class="title">
+
+<h1>SMART FUEL & ROUTE OPTIMIZER</h1>
+
+<p>Find the safest and fuel-efficient fishing route.</p>
+
+</div>
+
+<div class="main-grid">
+
+<!-- LEFT SIDE -->
+
+<div class="left-panel">
+
+<div class="card">
+
+<h2>Trip Details</h2>
+
+<label>Current Location</label>
+
+<div class="location-group">
+
+<input type="text"
+id="currentLocation"
+placeholder="Click Current Location">
+
+<button id="locationBtn">
+
+<i class="fa-solid fa-location-crosshairs"></i>
+
+Current Location
+
+</button>
+
+</div>
+
+<label>Destination</label>
+
+<input type="text"
+id="destination"
+placeholder="Enter Destination">
+
+<label>Boat Type</label>
+
+<select id="boatType">
+
+<option>Small Boat</option>
+
+<option>Medium Boat</option>
+
+<option>Large Boat</option>
+
+<option>Trawler</option>
+
+</select>
+
+<label>Fuel Available (Liters)</label>
+
+<input type="number"
+id="fuelAvailable"
+placeholder="Fuel Available">
+
+<label>Fuel Price (₹/Liter)</label>
+
+<input type="number"
+id="fuelPrice"
+placeholder="Fuel Price">
+
+<button id="optimizeBtn">
+
+<i class="fa-solid fa-route"></i>
+
+Optimize Route
+
+</button>
+
+</div>
+
+<div class="card">
+
+<h2>Current Weather</h2>
+
+<div class="weather-grid">
+
+<div class="weather-box">
+
+<h4>Temperature</h4>
+
+<p id="temperature">--</p>
+
+</div>
+
+<div class="weather-box">
+
+<h4>Wind</h4>
+
+<p id="wind">--</p>
+
+</div>
+
+<div class="weather-box">
+
+<h4>Weather</h4>
+
+<p id="weather">--</p>
+
+</div>
+
+<div class="weather-box">
+
+<h4>Sea Status</h4>
+
+<p id="sea">--</p>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="card">
+
+<h2>Map</h2>
+
+<div id="map"></div>
+
+</div>
+
+</div>
+
+<!-- RIGHT SIDE -->
+
+<div class="right-panel">
+
+<div class="card">
+
+<h2>Route Result</h2>
+
+<table>
+
+<tr>
+
+<td>Distance</td>
+
+<td id="distance">--</td>
+
+</tr>
+
+<tr>
+
+<td>Fuel Required</td>
+
+<td id="fuelNeed">--</td>
+
+</tr>
+
+<tr>
+
+<td>Fuel Cost</td>
+
+<td id="fuelCost">--</td>
+
+</tr>
+
+<tr>
+
+<td>Travel Time</td>
+
+<td id="travelTime">--</td>
+
+</tr>
+
+<tr>
+
+<td>Safety Score</td>
+
+<td id="safetyScore">--</td>
+
+</tr>
+
+</table>
+
+</div>
+
+<div class="card">
+
+<h2>Trip History</h2>
+
+<ul id="tripHistory">
+
+<li>No Trips Available</li>
+
+</ul>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script type="module" src="fuel.js"></script>
+</body>
+
+</html>

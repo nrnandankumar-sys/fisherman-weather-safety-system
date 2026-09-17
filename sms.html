@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fishers </title>
+    <link rel="icon" type="image/png" href="logo1.png">
+    <link rel="stylesheet" href="sms.css">
+</head>
+<body>
+    <header>
+        <img src="logo.png" alt="" class="logo">
+        <nav class="nav-links" id="navLinks">
+            <a href="main.html">Home</a>
+            <a href="weather.html">Weather</a>
+            <a href="alert.html">Alert</a>
+            <a href="map.html">Map</a>
+            <a href="sms.html">SOS system</a>
+            <a href="scheme.html">Government Schemes</a>
+        </nav>
+        <div class="menu-icon" id="menuIcon">☰</div>
+    </header>
+    <div class="container">
+
+    <h1>📢 Latest Safety Message</h1>
+
+    <div class="card">
+
+        <label style="font-weight: bold; color:black">Select Language</label>
+
+        <select id="language" onchange="changeLanguage()">
+
+            <option value="en">English</option>
+
+            <option value="te">Telugu</option>
+
+            <option value="kn">Kannada</option>
+
+            <option value="ta">Tamil</option>
+
+            <option value="ml">Malayalam</option>
+
+            <option value="hi">Hindi</option>
+
+        </select>
+
+        <hr>
+
+        <h3 style="font-weight: bold; color:black">Latest Official Message</h3>
+
+        <p id="message"></p>
+
+        <hr>
+
+        <p style="font-weight: bold; color:black"><b>Date :</b> <span id="date"></span></p>
+
+        <p style="font-weight: bold; color:black"><b>Time :</b> <span id="time"></span></p>
+
+        <p style="font-weight: bold; color:black"><b>Status :</b> ✅ Broadcasted by Coastal Safety Department</p>
+
+    </div>
+
+</div>
+
+    
+    <script src="sms.js"></script>
+</body>
+</html>
