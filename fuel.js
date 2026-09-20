@@ -1,180 +1,71 @@
-import { supabase } from "./supabase-config.js";
+// ===============================================================
+// SMART FUEL & ROUTE OPTIMIZER
+// ===============================================================
+
+// ===============================================================
+// GLOBAL VARIABLES
+// ===============================================================
+
+let map = null;
+let currentMarker = null;
+let destinationMarker = null;
+let routeLine = null;
+
+let currentCoordinates = null;
+let destinationCoordinates = null;
+
+
+// ===============================================================
+// BOAT FUEL CONSUMPTION
+// Liters per kilometer
+// ===============================================================
+
+const boatFuelRate = {
+    "Small Boat": 0.35,
+    "Medium Boat": 0.50,
+    "Large Boat": 0.75,
+    "Trawler": 1.20
+};
+
+
+// ===============================================================
+// DOM READY
+// ===============================================================
 
 document.addEventListener("DOMContentLoaded", function () {
 
-    /* ============================================================
-       AUTH CHECK
-    ============================================================ */
+    console.log("Fuel & Route Optimizer Loaded");
 
-    if (localStorage.getItem("isLoggedIn") !== "true") {
-        alert("Please Login First");
-        window.location.href = "main.html";
-        return;
-    }
+    initializeMap();
+    setupNavigation();
+    setupButtons();
+    loadTripHistory();
 
-    if (localStorage.getItem("isRegistered") !== "true") {
-        const register = confirm(
-            "Fuel Route Optimizer is available only for registered fishermen.\n\n" +
-            "Would you like to register now?"
-        );
+});
 
-        if (register) {
-            window.location.href = "register.html";
-        } else {
-            window.location.href = "main.html";
-        }
 
-        return;
-    }
+// ===============================================================
+// INITIALIZE MAP
+// ===============================================================
 
-    /* ============================================================
-       CURRENT USER
-    ============================================================ */
-
-    let currentUser = null;
-
-    try {
-        currentUser = JSON.parse(
-            localStorage.getItem("currentUser") || "null"
-        );
-    } catch (error) {
-        console.error("Unable to read current user:", error);
-    }
-
-    if (!currentUser) {
-        currentUser = {
-            id: localStorage.getItem("user_id") || null,
-            name: localStorage.getItem("user_name") || "",
-            phone: localStorage.getItem("user_phone") || ""
-        };
-    }
-
-    /* ============================================================
-       NAVIGATION
-    ============================================================ */
-
-    const menuIcon = document.getElementById("menuIcon");
-    const navLinks = document.getElementById("navLinks");
-
-    if (menuIcon && navLinks) {
-        menuIcon.addEventListener("click", function () {
-            navLinks.classList.toggle("active");
-        });
-    }
-
-    /* ============================================================
-       DOM ELEMENTS
-    ============================================================ */
-
-    const currentLocation =
-        document.getElementById("currentLocation");
-
-    const destination =
-        document.getElementById("destination");
-
-    const boatType =
-        document.getElementById("boatType");
-
-    const fuelAvailable =
-        document.getElementById("fuelAvailable");
-
-    const fuelPrice =
-        document.getElementById("fuelPrice");
-
-    const temperature =
-        document.getElementById("temperature");
-
-    const wind =
-        document.getElementById("wind");
-
-    const weather =
-        document.getElementById("weather");
-
-    const sea =
-        document.getElementById("sea");
-
-    const distance =
-        document.getElementById("distance");
-
-    const fuelNeed =
-        document.getElementById("fuelNeed");
-
-    const fuelCost =
-        document.getElementById("fuelCost");
-
-    const travelTime =
-        document.getElementById("travelTime");
-
-    const safetyScore =
-        document.getElementById("safetyScore");
-
-    const tripHistory =
-        document.getElementById("tripHistory");
-
-    const locationBtn =
-        document.getElementById("locationBtn");
-
-    const calculateBtn =
-        document.getElementById("calculateBtn");
-
-    /* ============================================================
-       RESULT / ROUTE OPTIMIZATION DISPLAY
-    ============================================================ */
-
-    let resultContainer =
-        document.getElementById("routeOptimizationResult");
-
-    if (!resultContainer) {
-
-        resultContainer = document.createElement("div");
-
-        resultContainer.id =
-            "routeOptimizationResult";
-
-        resultContainer.style.marginTop = "20px";
-        resultContainer.style.padding = "20px";
-        resultContainer.style.borderRadius = "15px";
-        resultContainer.style.background =
-            "rgba(0, 30, 60, 0.85)";
-        resultContainer.style.color = "white";
-        resultContainer.style.boxShadow =
-            "0 8px 25px rgba(0,0,0,0.3)";
-        resultContainer.style.lineHeight = "1.8";
-
-        if (calculateBtn && calculateBtn.parentElement) {
-            calculateBtn.parentElement.appendChild(
-                resultContainer
-            );
-        } else if (distance && distance.parentElement) {
-            distance.parentElement.parentElement.appendChild(
-                resultContainer
-            );
-        }
-    }
-
-    /* ============================================================
-       OPENWEATHER
-    ============================================================ */
-
-    const API_KEY =
-        "00635e07f8b20b8f0d5335fc43245700";
-
-    /* ============================================================
-       MAP
-    ============================================================ */
+function initializeMap() {
 
     const mapElement =
         document.getElementById("map");
 
     if (!mapElement) {
-        console.error("Map element #map was not found.");
+
+        console.error("Map element not found");
+
         return;
     }
 
-    const map = L.map("map").setView(
-        [15.9129, 79.7400],
-        7
+
+    map = L.map("map").setView(
+        [20.5937, 78.9629],
+        5
     );
+
 
     L.tileLayer(
         "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
@@ -184,1740 +75,1792 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     ).addTo(map);
 
-    let currentMarker = null;
-    let destinationMarker = null;
-    let routeLine = null;
-    let optimizedRouteLine = null;
 
-    /* ============================================================
-       MAP SIZE
-    ============================================================ */
+    console.log("Map initialized");
 
-    setTimeout(function () {
-        map.invalidateSize();
-    }, 500);
+}
 
-    window.addEventListener("resize", function () {
-        map.invalidateSize();
-    });
 
-    /* ============================================================
-       BOAT FUEL RATE
-    ============================================================ */
+// ===============================================================
+// NAVIGATION MENU
+// ===============================================================
 
-    const FUEL_RATE_PER_KM = {
+function setupNavigation() {
 
-        "Small Boat": 0.4,
+    const menuIcon =
+        document.getElementById("menuIcon");
 
-        "Medium Boat": 0.7,
+    const navLinks =
+        document.getElementById("navLinks");
 
-        "Large Boat": 1.2,
 
-        "Trawler": 1.6
-    };
+    if (
+        menuIcon &&
+        navLinks
+    ) {
 
-    /* ============================================================
-       BOAT SPEED
-    ============================================================ */
+        menuIcon.addEventListener(
+            "click",
+            function () {
 
-    const SPEED_KMH = {
+                navLinks.classList.toggle(
+                    "active"
+                );
 
-        "Small Boat": 15,
+            }
+        );
 
-        "Medium Boat": 20,
+    }
 
-        "Large Boat": 25,
+}
 
-        "Trawler": 18
-    };
 
-    /* ============================================================
-       LOCATION BUTTON
-    ============================================================ */
+// ===============================================================
+// BUTTON EVENTS
+// ===============================================================
+
+function setupButtons() {
+
+    const locationBtn =
+        document.getElementById("locationBtn");
+
+    const optimizeBtn =
+        document.getElementById("optimizeBtn");
+
 
     if (locationBtn) {
+
         locationBtn.addEventListener(
             "click",
             getCurrentLocation
         );
+
     }
 
-    /* ============================================================
-       CALCULATE BUTTON
-    ============================================================ */
 
-    if (calculateBtn) {
-        calculateBtn.addEventListener(
+    if (optimizeBtn) {
+
+        optimizeBtn.addEventListener(
             "click",
-            calculateRoute
+            optimizeRoute
         );
+
     }
 
-    /* ============================================================
-       GET CURRENT LOCATION
-    ============================================================ */
+}
 
-    function getCurrentLocation() {
 
-        if (!navigator.geolocation) {
-            alert(
-                "Geolocation is not supported on this device."
+// ===============================================================
+// GET CURRENT GPS LOCATION
+// ===============================================================
+
+function getCurrentLocation() {
+
+    if (!navigator.geolocation) {
+
+        alert(
+            "Geolocation is not supported by your browser."
+        );
+
+        return;
+    }
+
+
+    const locationBtn =
+        document.getElementById("locationBtn");
+
+
+    if (locationBtn) {
+
+        locationBtn.disabled = true;
+
+        locationBtn.innerHTML =
+            "Getting Location...";
+
+    }
+
+
+    navigator.geolocation.getCurrentPosition(
+
+        async function (position) {
+
+            const latitude =
+                position.coords.latitude;
+
+            const longitude =
+                position.coords.longitude;
+
+
+            currentCoordinates = {
+
+                lat: latitude,
+
+                lon: longitude
+
+            };
+
+
+            console.log(
+                "Current Coordinates:",
+                currentCoordinates
             );
-            return;
-        }
 
-        if (locationBtn) {
-            locationBtn.disabled = true;
-            locationBtn.textContent =
-                "Getting Location...";
-        }
 
-        navigator.geolocation.getCurrentPosition(
+            // ---------------------------------------------------
+            // SHOW MAP
+            // ---------------------------------------------------
 
-            async function (position) {
+            showCurrentMarker(
+                latitude,
+                longitude
+            );
 
-                const lat =
-                    position.coords.latitude;
 
-                const lng =
-                    position.coords.longitude;
+            // ---------------------------------------------------
+            // GET LOCATION NAME
+            // ---------------------------------------------------
 
-                localStorage.setItem(
-                    "user_latitude",
-                    lat
-                );
-
-                localStorage.setItem(
-                    "user_longitude",
-                    lng
-                );
-
-                if (currentMarker) {
-
-                    currentMarker.setLatLng([
-                        lat,
-                        lng
-                    ]);
-
-                } else {
-
-                    currentMarker =
-                        L.marker([
-                            lat,
-                            lng
-                        ])
-                        .addTo(map)
-                        .bindPopup(
-                            "<b>Current Location</b><br>" +
-                            lat.toFixed(6) +
-                            ", " +
-                            lng.toFixed(6)
-                        );
-                }
-
-                currentMarker.openPopup();
-
-                map.setView(
-                    [lat, lng],
-                    10
-                );
-
+            const locationName =
                 await reverseGeocode(
-                    lat,
-                    lng
+                    latitude,
+                    longitude
                 );
 
-                await fetchWeather(
-                    lat,
-                    lng
+
+            const currentInput =
+                document.getElementById(
+                    "currentLocation"
                 );
 
-                if (locationBtn) {
-                    locationBtn.disabled = false;
-                    locationBtn.textContent =
-                        "Get Current Location";
-                }
-            },
 
-            function (error) {
+            if (currentInput) {
 
-                console.error(
-                    "Geolocation error:",
-                    error
-                );
+                currentInput.value =
+                    locationName;
 
-                if (locationBtn) {
-                    locationBtn.disabled = false;
-                    locationBtn.textContent =
-                        "Get Current Location";
-                }
-
-                if (error.code === 1) {
-                    alert(
-                        "Please allow location permission."
-                    );
-                } else if (error.code === 2) {
-                    alert(
-                        "Unable to determine your location."
-                    );
-                } else if (error.code === 3) {
-                    alert(
-                        "Location request timed out."
-                    );
-                } else {
-                    alert(
-                        "Unable to get your current location."
-                    );
-                }
-            },
-
-            {
-                enableHighAccuracy: true,
-                timeout: 15000,
-                maximumAge: 0
             }
+
+
+            // ---------------------------------------------------
+            // GET WEATHER
+            // ---------------------------------------------------
+
+            await getWeather(
+                latitude,
+                longitude
+            );
+
+
+            if (locationBtn) {
+
+                locationBtn.disabled =
+                    false;
+
+                locationBtn.innerHTML =
+                    '<i class="fa-solid fa-location-crosshairs"></i> Current Location';
+
+            }
+
+        },
+
+        function (error) {
+
+            console.error(
+                "GPS Error:",
+                error
+            );
+
+
+            let message =
+                "Unable to get your location.";
+
+
+            if (error.code === 1) {
+
+                message =
+                    "Location permission was denied.";
+
+            }
+
+            else if (error.code === 2) {
+
+                message =
+                    "Location information is unavailable.";
+
+            }
+
+            else if (error.code === 3) {
+
+                message =
+                    "Location request timed out.";
+
+            }
+
+
+            alert(message);
+
+
+            if (locationBtn) {
+
+                locationBtn.disabled =
+                    false;
+
+                locationBtn.innerHTML =
+                    '<i class="fa-solid fa-location-crosshairs"></i> Current Location';
+
+            }
+
+        },
+
+        {
+            enableHighAccuracy: true,
+
+            timeout: 15000,
+
+            maximumAge: 0
+
+        }
+
+    );
+
+}
+
+
+// ===============================================================
+// SHOW CURRENT LOCATION MARKER
+// ===============================================================
+
+function showCurrentMarker(
+    latitude,
+    longitude
+) {
+
+    if (!map) {
+        return;
+    }
+
+
+    if (currentMarker) {
+
+        map.removeLayer(
+            currentMarker
         );
+
     }
 
-    /* ============================================================
-       REVERSE GEOCODING
-    ============================================================ */
 
-    async function reverseGeocode(
-        lat,
-        lng
-    ) {
+    currentMarker =
+        L.marker(
+            [
+                latitude,
+                longitude
+            ]
+        )
+        .addTo(map)
+        .bindPopup(
+            "<b>Current Location</b>"
+        );
 
-        if (!currentLocation) {
-            return;
-        }
 
-        try {
+    currentMarker.openPopup();
 
-            const response =
-                await fetch(
-                    `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`,
-                    {
-                        headers: {
-                            "Accept":
-                                "application/json"
-                        }
-                    }
-                );
 
-            if (!response.ok) {
-                throw new Error(
-                    "Reverse geocoding failed"
-                );
-            }
+    map.setView(
+        [
+            latitude,
+            longitude
+        ],
+        10
+    );
 
-            const data =
-                await response.json();
+}
 
-            const address =
-                data.address || {};
 
-            const place =
-                address.village ||
-                address.town ||
-                address.city ||
-                address.municipality ||
-                address.county ||
-                address.state ||
-                data.display_name ||
-                `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
+// ===============================================================
+// REVERSE GEOCODING
+// ===============================================================
 
-            currentLocation.value = place;
+async function reverseGeocode(
+    latitude,
+    longitude
+) {
 
-            localStorage.setItem(
-                "user_location",
-                place
-            );
+    try {
 
-        } catch (error) {
+        const url =
+            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=18&addressdetails=1`;
 
-            console.error(
-                "Reverse geocoding error:",
-                error
-            );
-
-            currentLocation.value =
-                `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
-        }
-    }
-
-    /* ============================================================
-       WEATHER
-    ============================================================ */
-
-    async function fetchWeather(
-        lat,
-        lng
-    ) {
-
-        try {
-
-            const response =
-                await fetch(
-                    `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lng}&units=metric&appid=${API_KEY}`
-                );
-
-            if (!response.ok) {
-                throw new Error(
-                    "Weather API failed"
-                );
-            }
-
-            const data =
-                await response.json();
-
-            if (temperature) {
-
-                temperature.textContent =
-                    Math.round(
-                        data.main.temp
-                    ) + "°C";
-            }
-
-            const windKmh =
-                Number(data.wind?.speed || 0) *
-                3.6;
-
-            if (wind) {
-
-                wind.textContent =
-                    Math.round(
-                        windKmh
-                    ) + " km/h";
-            }
-
-            if (weather) {
-
-                weather.textContent =
-                    data.weather?.[0]?.description ||
-                    "N/A";
-            }
-
-            if (sea) {
-
-                if (windKmh > 40) {
-
-                    sea.textContent =
-                        "Rough";
-
-                } else if (windKmh > 20) {
-
-                    sea.textContent =
-                        "Moderate";
-
-                } else {
-
-                    sea.textContent =
-                        "Calm";
-                }
-            }
-
-        } catch (error) {
-
-            console.error(
-                "Weather error:",
-                error
-            );
-
-            if (temperature)
-                temperature.textContent = "--";
-
-            if (wind)
-                wind.textContent = "--";
-
-            if (weather)
-                weather.textContent =
-                    "Unavailable";
-
-            if (sea)
-                sea.textContent =
-                    "Unknown";
-        }
-    }
-
-    /* ============================================================
-       DESTINATION GEOCODING
-    ============================================================ */
-
-    async function geocodeDestination(
-        destinationName
-    ) {
 
         const response =
-            await fetch(
-                `https://nominatim.openstreetmap.org/search?format=json&limit=1&q=${encodeURIComponent(destinationName)}`,
-                {
-                    headers: {
-                        "Accept":
-                            "application/json"
-                    }
+            await fetch(url, {
+                headers: {
+                    "Accept":
+                        "application/json"
                 }
-            );
+            });
+
 
         if (!response.ok) {
+
             throw new Error(
-                "Destination search failed"
+                "Reverse geocoding failed"
             );
+
         }
+
 
         const data =
             await response.json();
+
+
+        const address =
+            data.address || {};
+
+
+        return (
+
+            address.village ||
+
+            address.town ||
+
+            address.city ||
+
+            address.municipality ||
+
+            address.county ||
+
+            address.state ||
+
+            data.display_name ||
+
+            "Current Location"
+
+        );
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "Reverse Geocoding Error:",
+            error
+        );
+
+
+        return "Current Location";
+
+    }
+
+}
+
+
+// ===============================================================
+// DESTINATION GEOCODING
+// ===============================================================
+
+async function geocodeDestination(
+    destination
+) {
+
+    try {
+
+        const url =
+            `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(destination)}&limit=1`;
+
+
+        const response =
+            await fetch(url, {
+                headers: {
+                    "Accept":
+                        "application/json"
+                }
+            });
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                "Destination search failed"
+            );
+
+        }
+
+
+        const data =
+            await response.json();
+
 
         if (
             !data ||
             data.length === 0
         ) {
+
             throw new Error(
                 "Destination not found"
             );
+
         }
+
 
         return {
-            lat: parseFloat(
-                data[0].lat
-            ),
-            lng: parseFloat(
-                data[0].lon
-            )
-        };
-    }
 
-    /* ============================================================
-       HAVERSINE DISTANCE
-    ============================================================ */
-
-    function haversineDistance(
-        lat1,
-        lon1,
-        lat2,
-        lon2
-    ) {
-
-        const R = 6371;
-
-        const dLat =
-            toRadians(lat2 - lat1);
-
-        const dLon =
-            toRadians(lon2 - lon1);
-
-        const a =
-            Math.sin(dLat / 2) *
-            Math.sin(dLat / 2) +
-
-            Math.cos(
-                toRadians(lat1)
-            ) *
-
-            Math.cos(
-                toRadians(lat2)
-            ) *
-
-            Math.sin(dLon / 2) *
-            Math.sin(dLon / 2);
-
-        const c =
-            2 *
-            Math.atan2(
-                Math.sqrt(a),
-                Math.sqrt(1 - a)
-            );
-
-        return R * c;
-    }
-
-    function toRadians(degrees) {
-        return degrees *
-            Math.PI /
-            180;
-    }
-
-    /* ============================================================
-       MAIN ROUTE CALCULATION
-    ============================================================ */
-
-    async function calculateRoute() {
-
-        if (!currentMarker) {
-
-            alert(
-                "Please click 'Get Current Location' first."
-            );
-
-            return;
-        }
-
-        if (
-            !destination ||
-            destination.value.trim() === ""
-        ) {
-
-            alert(
-                "Please enter a destination."
-            );
-
-            return;
-        }
-
-        if (calculateBtn) {
-
-            calculateBtn.disabled = true;
-
-            calculateBtn.textContent =
-                "Optimizing Route...";
-        }
-
-        resultContainer.innerHTML =
-            `
-            <h3>⚓ Route Optimization</h3>
-            <p>Searching for the safest and shortest route...</p>
-            `;
-
-        try {
-
-            /* ====================================================
-               START LOCATION
-            ==================================================== */
-
-            const start =
-                currentMarker.getLatLng();
-
-            /* ====================================================
-               DESTINATION
-            ==================================================== */
-
-            const end =
-                await geocodeDestination(
-                    destination.value.trim()
-                );
-
-            /* ====================================================
-               STRAIGHT DISTANCE
-            ==================================================== */
-
-            const straightDistance =
-                haversineDistance(
-                    start.lat,
-                    start.lng,
-                    end.lat,
-                    end.lng
-                );
-
-            /* ====================================================
-               GET OPTIMIZED ROUTE
-            ==================================================== */
-
-            const routeInfo =
-                await optimizeRoute(
-                    start,
-                    end
-                );
-
-            let distanceKm =
-                routeInfo.distanceKm;
-
-            let travelHours =
-                routeInfo.durationHours;
-
-            let routeType =
-                routeInfo.routeType;
-
-            /* ====================================================
-               FALLBACK
-            ==================================================== */
-
-            if (
-                !distanceKm ||
-                distanceKm <= 0
-            ) {
-
-                distanceKm =
-                    straightDistance;
-
-                routeType =
-                    "Direct Sea Route";
-
-                const type =
-                    boatType?.value ||
-                    "Small Boat";
-
-                const speed =
-                    SPEED_KMH[type] ||
-                    SPEED_KMH["Small Boat"];
-
-                travelHours =
-                    distanceKm / speed;
-            }
-
-            /* ====================================================
-               BOAT INFORMATION
-            ==================================================== */
-
-            const type =
-                boatType?.value ||
-                "Small Boat";
-
-            const fuelRate =
-                FUEL_RATE_PER_KM[type] ||
-                FUEL_RATE_PER_KM["Small Boat"];
-
-            const speed =
-                SPEED_KMH[type] ||
-                SPEED_KMH["Small Boat"];
-
-            /* ====================================================
-               FUEL CALCULATION
-            ==================================================== */
-
-            const fuelNeededLitres =
-                distanceKm *
-                fuelRate;
-
-            const price =
-                fuelPrice &&
+            lat:
                 parseFloat(
-                    fuelPrice.value
-                ) > 0
+                    data[0].lat
+                ),
 
-                    ? parseFloat(
-                        fuelPrice.value
-                    )
+            lon:
+                parseFloat(
+                    data[0].lon
+                ),
 
-                    : 0;
+            name:
+                data[0].display_name
 
-            const totalCost =
-                fuelNeededLitres *
-                price;
+        };
 
-            /* ====================================================
-               TRAVEL TIME FALLBACK
-            ==================================================== */
-
-            if (
-                !travelHours ||
-                travelHours <= 0
-            ) {
-
-                travelHours =
-                    distanceKm / speed;
-            }
-
-            /* ====================================================
-               SAFETY SCORE
-            ==================================================== */
-
-            const score =
-                calculateSafetyScore();
-
-            /* ====================================================
-               DISPLAY NORMAL RESULTS
-            ==================================================== */
-
-            displayResults({
-
-                distanceKm,
-
-                fuelNeededLitres,
-
-                totalCost,
-
-                travelHours,
-
-                score
-            });
-
-            /* ====================================================
-               DISPLAY ROUTE OPTIMIZATION
-            ==================================================== */
-
-            displayRouteOptimization({
-
-                routeType,
-
-                straightDistance,
-
-                optimizedDistance:
-                    distanceKm,
-
-                fuelNeeded:
-                    fuelNeededLitres,
-
-                travelHours,
-
-                score,
-
-                boatType:
-                    type
-            });
-
-            /* ====================================================
-               FUEL WARNING
-            ==================================================== */
-
-            checkFuelSufficiency(
-                fuelNeededLitres
-            );
-
-            /* ====================================================
-               SAVE TRIP
-            ==================================================== */
-
-            await saveTripToSupabase({
-
-                destination:
-                    destination.value.trim(),
-
-                distanceKm,
-
-                fuelNeededLitres,
-
-                totalCost,
-
-                travelHours,
-
-                score,
-
-                startLatitude:
-                    start.lat,
-
-                startLongitude:
-                    start.lng,
-
-                destinationLatitude:
-                    end.lat,
-
-                destinationLongitude:
-                    end.lng
-            });
-
-            /* ====================================================
-               LOAD HISTORY
-            ==================================================== */
-
-            await loadTripHistory();
-
-        } catch (error) {
-
-            console.error(
-                "Route calculation error:",
-                error
-            );
-
-            resultContainer.innerHTML =
-                `
-                <h3>⚠️ Route Calculation Error</h3>
-                <p>${escapeHTML(
-                    error.message ||
-                    "Unable to calculate route."
-                )}</p>
-                `;
-
-            alert(
-                "Unable to calculate the route.\n\n" +
-                (error.message ||
-                    "Please check the destination and internet connection.")
-            );
-
-        } finally {
-
-            if (calculateBtn) {
-
-                calculateBtn.disabled =
-                    false;
-
-                calculateBtn.textContent =
-                    "Calculate Route";
-            }
-        }
     }
 
-    /* ============================================================
-       ROUTE OPTIMIZATION
-    ============================================================ */
+    catch (error) {
 
-    async function optimizeRoute(
-        start,
-        end
-    ) {
-
-        /* ========================================================
-           REMOVE OLD ROUTES
-        ======================================================== */
-
-        if (routeLine) {
-
-            map.removeLayer(
-                routeLine
-            );
-
-            routeLine = null;
-        }
-
-        if (optimizedRouteLine) {
-
-            map.removeLayer(
-                optimizedRouteLine
-            );
-
-            optimizedRouteLine = null;
-        }
-
-        if (destinationMarker) {
-
-            map.removeLayer(
-                destinationMarker
-            );
-
-            destinationMarker = null;
-        }
-
-        /* ========================================================
-           DESTINATION MARKER
-        ======================================================== */
-
-        destinationMarker =
-            L.marker([
-                end.lat,
-                end.lng
-            ])
-            .addTo(map)
-            .bindPopup(
-                "<b>Destination</b><br>" +
-                escapeHTML(
-                    destination?.value ||
-                    "Destination"
-                )
-            );
-
-        /* ========================================================
-           OSRM ROUTE
-        ======================================================== */
-
-        try {
-
-            const url =
-                `https://router.project-osrm.org/route/v1/driving/` +
-                `${start.lng},${start.lat};` +
-                `${end.lng},${end.lat}` +
-                `?overview=full&geometries=geojson`;
-
-            const response =
-                await fetch(url);
-
-            if (!response.ok) {
-                throw new Error(
-                    "OSRM unavailable"
-                );
-            }
-
-            const data =
-                await response.json();
-
-            if (
-                data.code === "Ok" &&
-                data.routes &&
-                data.routes.length > 0
-            ) {
-
-                const route =
-                    data.routes[0];
-
-                const coordinates =
-                    route.geometry.coordinates.map(
-                        function (coordinate) {
-
-                            return [
-                                coordinate[1],
-                                coordinate[0]
-                            ];
-                        }
-                    );
-
-                optimizedRouteLine =
-                    L.polyline(
-                        coordinates,
-                        {
-                            weight: 6,
-                            opacity: 0.9
-                        }
-                    ).addTo(map);
-
-                map.fitBounds(
-                    optimizedRouteLine.getBounds(),
-                    {
-                        padding: [
-                            50,
-                            50
-                        ]
-                    }
-                );
-
-                return {
-
-                    distanceKm:
-                        route.distance / 1000,
-
-                    durationHours:
-                        route.duration / 3600,
-
-                    routeType:
-                        "Optimized Route"
-                };
-            }
-
-        } catch (error) {
-
-            console.warn(
-                "Road route unavailable. Using direct sea route.",
-                error
-            );
-        }
-
-        /* ========================================================
-           DIRECT SEA ROUTE FALLBACK
-        ======================================================== */
-
-        const directCoordinates = [
-            [
-                start.lat,
-                start.lng
-            ],
-
-            [
-                end.lat,
-                end.lng
-            ]
-        ];
-
-        routeLine =
-            L.polyline(
-                directCoordinates,
-                {
-                    weight: 6,
-                    opacity: 0.9,
-                    dashArray: "10,10"
-                }
-            ).addTo(map);
-
-        map.fitBounds(
-            routeLine.getBounds(),
-            {
-                padding: [
-                    50,
-                    50
-                ]
-            }
+        console.error(
+            "Destination Geocoding Error:",
+            error
         );
 
-        const distanceKm =
-            haversineDistance(
-                start.lat,
-                start.lng,
-                end.lat,
-                end.lng
-            );
 
-        const type =
-            boatType?.value ||
-            "Small Boat";
+        throw error;
 
-        const speed =
-            SPEED_KMH[type] ||
-            SPEED_KMH["Small Boat"];
-
-        return {
-
-            distanceKm,
-
-            durationHours:
-                distanceKm / speed,
-
-            routeType:
-                "Direct Sea Route"
-        };
     }
 
-    /* ============================================================
-       SAFETY SCORE
-    ============================================================ */
+}
 
-    function calculateSafetyScore() {
 
-        let score = 100;
+// ===============================================================
+// OPTIMIZE ROUTE
+// ===============================================================
 
-        const seaState =
-            sea?.textContent?.trim() ||
-            "Unknown";
+async function optimizeRoute() {
 
-        const windText =
-            wind?.textContent ||
-            "";
+    const currentInput =
+        document.getElementById(
+            "currentLocation"
+        );
 
-        const windValue =
-            parseFloat(
-                windText
-            ) || 0;
+    const destinationInput =
+        document.getElementById(
+            "destination"
+        );
 
-        /* ========================================================
-           SEA CONDITION
-        ======================================================== */
+    const boatTypeInput =
+        document.getElementById(
+            "boatType"
+        );
 
-        if (seaState === "Rough") {
+    const fuelAvailableInput =
+        document.getElementById(
+            "fuelAvailable"
+        );
 
-            score -= 50;
+    const fuelPriceInput =
+        document.getElementById(
+            "fuelPrice"
+        );
 
-        } else if (
-            seaState === "Moderate"
-        ) {
+    const optimizeBtn =
+        document.getElementById(
+            "optimizeBtn"
+        );
 
-            score -= 25;
-        }
 
-        /* ========================================================
-           WIND
-        ======================================================== */
+    const destination =
+        destinationInput
+            ? destinationInput.value.trim()
+            : "";
 
-        if (windValue > 40) {
 
-            score -= 30;
+    const boatType =
+        boatTypeInput
+            ? boatTypeInput.value
+            : "Small Boat";
 
-        } else if (windValue > 30) {
 
-            score -= 20;
+    const fuelAvailable =
+        fuelAvailableInput
+            ? parseFloat(
+                fuelAvailableInput.value
+            )
+            : 0;
 
-        } else if (windValue > 20) {
 
-            score -= 10;
-        }
+    const fuelPrice =
+        fuelPriceInput
+            ? parseFloat(
+                fuelPriceInput.value
+            )
+            : 0;
 
-        /* ========================================================
-           LIMIT SCORE
-        ======================================================== */
 
-        score =
-            Math.max(
-                0,
-                Math.min(
-                    100,
-                    score
-                )
-            );
+    // -----------------------------------------------------------
+    // VALIDATION
+    // -----------------------------------------------------------
 
-        return score;
+    if (!currentCoordinates) {
+
+        alert(
+            "Please click 'Current Location' first."
+        );
+
+        return;
     }
 
-    /* ============================================================
-       DISPLAY CALCULATED RESULTS
-    ============================================================ */
 
-    function displayResults({
-        distanceKm,
-        fuelNeededLitres,
-        totalCost,
-        travelHours,
-        score
-    }) {
+    if (!destination) {
 
-        if (distance) {
+        alert(
+            "Please enter a destination."
+        );
 
-            distance.textContent =
-                distanceKm.toFixed(2) +
-                " km";
-        }
-
-        if (fuelNeed) {
-
-            fuelNeed.textContent =
-                fuelNeededLitres.toFixed(2) +
-                " L";
-        }
-
-        if (fuelCost) {
-
-            fuelCost.textContent =
-                "₹" +
-                totalCost.toFixed(2);
-        }
-
-        if (travelTime) {
-
-            let hours =
-                Math.floor(
-                    travelHours
-                );
-
-            let minutes =
-                Math.round(
-                    (
-                        travelHours -
-                        hours
-                    ) * 60
-                );
-
-            if (minutes === 60) {
-
-                hours++;
-                minutes = 0;
-            }
-
-            travelTime.textContent =
-                hours +
-                "h " +
-                minutes +
-                "m";
-        }
-
-        if (safetyScore) {
-
-            safetyScore.textContent =
-                score +
-                " / 100";
-
-            if (score >= 80) {
-
-                safetyScore.style.color =
-                    "green";
-
-            } else if (score >= 50) {
-
-                safetyScore.style.color =
-                    "orange";
-
-            } else {
-
-                safetyScore.style.color =
-                    "red";
-            }
-        }
+        return;
     }
 
-    /* ============================================================
-       ROUTE OPTIMIZATION RESULT
-    ============================================================ */
 
-    function displayRouteOptimization({
-        routeType,
-        straightDistance,
-        optimizedDistance,
-        fuelNeeded,
-        travelHours,
-        score,
-        boatType
-    }) {
-
-        const distanceSaved =
-            Math.max(
-                0,
-                straightDistance -
-                optimizedDistance
-            );
-
-        const fuelPriceValue =
-            fuelPrice &&
-            parseFloat(
-                fuelPrice.value
-            ) > 0
-
-                ? parseFloat(
-                    fuelPrice.value
-                )
-
-                : 0;
-
-        const estimatedCost =
-            fuelNeeded *
-            fuelPriceValue;
-
-        let safetyText =
-            "Safe";
-
-        if (score < 50) {
-
-            safetyText =
-                "Dangerous";
-
-        } else if (score < 80) {
-
-            safetyText =
-                "Moderate Risk";
-        }
-
-        let hours =
-            Math.floor(
-                travelHours
-            );
-
-        let minutes =
-            Math.round(
-                (
-                    travelHours -
-                    hours
-                ) * 60
-            );
-
-        if (minutes === 60) {
-
-            hours++;
-            minutes = 0;
-        }
-
-        resultContainer.innerHTML =
-            `
-            <div style="
-                border:1px solid rgba(0,220,255,0.5);
-                border-radius:15px;
-                padding:20px;
-            ">
-
-                <h2 style="
-                    margin-top:0;
-                    text-align:center;
-                ">
-                    ⚓ Route Optimization
-                </h2>
-
-                <p>
-                    <strong>Route Type:</strong>
-                    ${escapeHTML(routeType)}
-                </p>
-
-                <p>
-                    <strong>Boat Type:</strong>
-                    ${escapeHTML(boatType)}
-                </p>
-
-                <hr>
-
-                <p>
-                    📍 <strong>Direct Distance:</strong>
-                    ${straightDistance.toFixed(2)} km
-                </p>
-
-                <p>
-                    🧭 <strong>Optimized Distance:</strong>
-                    ${optimizedDistance.toFixed(2)} km
-                </p>
-
-                <p>
-                    📉 <strong>Distance Difference:</strong>
-                    ${distanceSaved.toFixed(2)} km
-                </p>
-
-                <p>
-                    ⛽ <strong>Fuel Required:</strong>
-                    ${fuelNeeded.toFixed(2)} L
-                </p>
-
-                <p>
-                    💰 <strong>Estimated Fuel Cost:</strong>
-                    ₹${estimatedCost.toFixed(2)}
-                </p>
-
-                <p>
-                    ⏱️ <strong>Estimated Travel Time:</strong>
-                    ${hours}h ${minutes}m
-                </p>
-
-                <p>
-                    🌊 <strong>Sea Condition:</strong>
-                    ${escapeHTML(
-                        sea?.textContent ||
-                        "Unknown"
-                    )}
-                </p>
-
-                <p>
-                    💨 <strong>Wind Speed:</strong>
-                    ${escapeHTML(
-                        wind?.textContent ||
-                        "Unknown"
-                    )}
-                </p>
-
-                <p>
-                    🛡️ <strong>Safety Score:</strong>
-                    ${score} / 100
-                </p>
-
-                <p>
-                    🚦 <strong>Safety Status:</strong>
-                    ${safetyText}
-                </p>
-
-                <hr>
-
-                <div style="
-                    text-align:center;
-                    padding:12px;
-                    border-radius:10px;
-                    background:rgba(0,150,255,0.15);
-                ">
-                    <strong>
-                        ${routeType === "Optimized Route"
-                            ? "✓ Optimized route calculated successfully"
-                            : "✓ Direct sea route calculated successfully"}
-                    </strong>
-                </div>
-
-            </div>
-            `;
-    }
-
-    /* ============================================================
-       FUEL SUFFICIENCY
-    ============================================================ */
-
-    function checkFuelSufficiency(
-        fuelNeededLitres
+    if (
+        isNaN(fuelAvailable) ||
+        fuelAvailable <= 0
     ) {
 
-        if (!fuelAvailable) {
-            return;
-        }
+        alert(
+            "Please enter available fuel."
+        );
 
-        const available =
-            parseFloat(
-                fuelAvailable.value
+        return;
+    }
+
+
+    if (
+        isNaN(fuelPrice) ||
+        fuelPrice <= 0
+    ) {
+
+        alert(
+            "Please enter fuel price."
+        );
+
+        return;
+    }
+
+
+    // -----------------------------------------------------------
+    // BUTTON LOADING
+    // -----------------------------------------------------------
+
+    if (optimizeBtn) {
+
+        optimizeBtn.disabled = true;
+
+        optimizeBtn.innerHTML =
+            '<i class="fa-solid fa-spinner fa-spin"></i> Optimizing...';
+
+    }
+
+
+    try {
+
+        // -------------------------------------------------------
+        // FIND DESTINATION
+        // -------------------------------------------------------
+
+        destinationCoordinates =
+            await geocodeDestination(
+                destination
             );
 
+
+        console.log(
+            "Destination:",
+            destinationCoordinates
+        );
+
+
+        // -------------------------------------------------------
+        // SHOW DESTINATION
+        // -------------------------------------------------------
+
+        showDestinationMarker(
+            destinationCoordinates.lat,
+            destinationCoordinates.lon,
+            destinationCoordinates.name
+        );
+
+
+        // -------------------------------------------------------
+        // GET ROUTE
+        // -------------------------------------------------------
+
+        const route =
+            await getRoute(
+                currentCoordinates,
+                destinationCoordinates
+            );
+
+
+        if (!route) {
+
+            throw new Error(
+                "Unable to calculate route."
+            );
+
+        }
+
+
+        // -------------------------------------------------------
+        // CALCULATE FUEL
+        // -------------------------------------------------------
+
+        const distanceKm =
+            route.distance / 1000;
+
+
+        const fuelRate =
+            boatFuelRate[boatType] ||
+            0.50;
+
+
+        const fuelRequired =
+            distanceKm * fuelRate;
+
+
+        const fuelCost =
+            fuelRequired * fuelPrice;
+
+
+        const travelTimeHours =
+            route.duration / 3600;
+
+
+        // -------------------------------------------------------
+        // SAFETY SCORE
+        // -------------------------------------------------------
+
+        const safetyScore =
+            calculateSafetyScore();
+
+
+        // -------------------------------------------------------
+        // DISPLAY RESULT
+        // -------------------------------------------------------
+
+        displayRouteResult({
+
+            distance:
+                distanceKm,
+
+            fuelRequired:
+                fuelRequired,
+
+            fuelCost:
+                fuelCost,
+
+            travelTime:
+                travelTimeHours,
+
+            safetyScore:
+                safetyScore,
+
+            fuelAvailable:
+                fuelAvailable,
+
+            boatType:
+                boatType
+
+        });
+
+
+        // -------------------------------------------------------
+        // CHECK FUEL
+        // -------------------------------------------------------
+
         if (
-            !isNaN(available) &&
-            available < fuelNeededLitres
+            fuelRequired >
+            fuelAvailable
         ) {
 
             alert(
-                `Warning: You have ${available}L available, ` +
-                `but this trip needs approximately ` +
-                `${fuelNeededLitres.toFixed(2)}L.` +
-                `\n\nConsider refuelling before departure.`
+                "⚠️ INSUFFICIENT FUEL\n\n" +
+
+                "Required: " +
+                fuelRequired.toFixed(2) +
+                " L\n" +
+
+                "Available: " +
+                fuelAvailable.toFixed(2) +
+                " L\n\n" +
+
+                "Please increase fuel before starting the trip."
             );
+
         }
+
+        else {
+
+            alert(
+                "✅ Route Optimized Successfully\n\n" +
+
+                "Distance: " +
+                distanceKm.toFixed(2) +
+                " km\n" +
+
+                "Fuel Required: " +
+                fuelRequired.toFixed(2) +
+                " L\n" +
+
+                "Fuel Cost: ₹" +
+                fuelCost.toFixed(2)
+            );
+
+        }
+
+
+        // -------------------------------------------------------
+        // SAVE TRIP
+        // -------------------------------------------------------
+
+        saveTrip({
+
+            destination:
+                destination,
+
+            distance:
+                distanceKm,
+
+            fuel:
+                fuelRequired,
+
+            cost:
+                fuelCost,
+
+            time:
+                travelTimeHours,
+
+            safety:
+                safetyScore,
+
+            boat:
+                boatType
+
+        });
+
+
+        loadTripHistory();
+
     }
 
-    /* ============================================================
-       SAVE TRIP TO SUPABASE
-       IMPORTANT: NO .select().single()
-    ============================================================ */
+    catch (error) {
 
-    async function saveTripToSupabase(
-        trip
+        console.error(
+            "Route Optimization Error:",
+            error
+        );
+
+
+        alert(
+            "Unable to optimize route.\n\n" +
+            (
+                error.message ||
+                "Please check your location and destination."
+            )
+        );
+
+    }
+
+    finally {
+
+        if (optimizeBtn) {
+
+            optimizeBtn.disabled =
+                false;
+
+            optimizeBtn.innerHTML =
+                '<i class="fa-solid fa-route"></i> Optimize Route';
+
+        }
+
+    }
+
+}
+
+
+// ===============================================================
+// GET ROUTE USING OSRM
+// ===============================================================
+
+async function getRoute(
+    start,
+    destination
+) {
+
+    const url =
+        `https://router.project-osrm.org/route/v1/driving/` +
+
+        `${start.lon},${start.lat};` +
+
+        `${destination.lon},${destination.lat}` +
+
+        `?overview=full&geometries=geojson`;
+
+
+    const response =
+        await fetch(url);
+
+
+    if (!response.ok) {
+
+        throw new Error(
+            "Routing service unavailable."
+        );
+
+    }
+
+
+    const data =
+        await response.json();
+
+
+    if (
+        data.code !== "Ok" ||
+        !data.routes ||
+        data.routes.length === 0
     ) {
 
-        try {
+        throw new Error(
+            "No route found."
+        );
 
-            const userId =
-                currentUser.id ||
-                localStorage.getItem(
-                    "user_id"
-                ) ||
-                null;
-
-            const userName =
-                currentUser.name ||
-                localStorage.getItem(
-                    "user_name"
-                ) ||
-                "";
-
-            const phone =
-                currentUser.phone ||
-                localStorage.getItem(
-                    "user_phone"
-                ) ||
-                "";
-
-            const { error } =
-                await supabase
-                    .from("trip_history")
-                    .insert([
-                        {
-
-                            user_id:
-                                userId,
-
-                            user_name:
-                                userName,
-
-                            phone:
-                                phone,
-
-                            destination:
-                                trip.destination,
-
-                            distance_km:
-                                trip.distanceKm,
-
-                            fuel_needed_litres:
-                                trip.fuelNeededLitres,
-
-                            total_cost:
-                                trip.totalCost,
-
-                            travel_hours:
-                                trip.travelHours,
-
-                            safety_score:
-                                trip.score,
-
-                            start_latitude:
-                                trip.startLatitude,
-
-                            start_longitude:
-                                trip.startLongitude,
-
-                            destination_latitude:
-                                trip.destinationLatitude,
-
-                            destination_longitude:
-                                trip.destinationLongitude
-                        }
-                    ]);
-
-            if (error) {
-                throw error;
-            }
-
-            console.log(
-                "Trip successfully saved to Supabase."
-            );
-
-        } catch (error) {
-
-            console.error(
-                "Supabase trip save error:",
-                error
-            );
-
-            /*
-                Do not stop route calculation
-                when history saving fails.
-            */
-        }
     }
 
-    /* ============================================================
-       LOAD TRIP HISTORY
-    ============================================================ */
 
-    async function loadTripHistory() {
+    const route =
+        data.routes[0];
 
-        if (!tripHistory) {
-            return;
-        }
 
-        try {
+    drawRoute(
+        route.geometry
+    );
 
-            const userId =
-                currentUser.id ||
-                localStorage.getItem(
-                    "user_id"
-                );
 
-            if (!userId) {
+    return route;
 
-                tripHistory.innerHTML =
-                    "<p style='text-align:center;'>No trips yet</p>";
+}
 
-                return;
-            }
 
-            const {
-                data: trips,
-                error
-            } =
-                await supabase
-                    .from("trip_history")
-                    .select("*")
-                    .eq(
-                        "user_id",
-                        userId
-                    )
-                    .order(
-                        "created_at",
-                        {
-                            ascending: false
-                        }
-                    )
-                    .limit(20);
+// ===============================================================
+// DRAW ROUTE ON LEAFLET MAP
+// ===============================================================
 
-            if (error) {
-                throw error;
-            }
+function drawRoute(
+    geometry
+) {
 
-            if (
-                !trips ||
-                trips.length === 0
-            ) {
+    if (!map) {
+        return;
+    }
 
-                tripHistory.innerHTML =
-                    "<p style='text-align:center;'>No trips yet</p>";
 
-                return;
-            }
+    if (routeLine) {
 
-            tripHistory.innerHTML = "";
+        map.removeLayer(
+            routeLine
+        );
 
-            trips.forEach(
-                function (trip) {
+    }
 
-                    const item =
-                        document.createElement(
-                            "div"
-                        );
 
-                    item.className =
-                        "trip-item";
-
-                    item.style.padding =
-                        "12px";
-
-                    item.style.marginBottom =
-                        "10px";
-
-                    item.style.borderRadius =
-                        "10px";
-
-                    item.style.background =
-                        "rgba(0,100,180,0.15)";
-
-                    const date =
-                        trip.created_at
-                            ? new Date(
-                                trip.created_at
-                            ).toLocaleString()
-                            : "Recently";
-
-                    item.innerHTML =
-                        `
-                        <div>
-                            <h4>
-                                ${escapeHTML(
-                                    trip.destination ||
-                                    "Unknown"
-                                )}
-                            </h4>
-
-                            <small>
-                                Distance:
-                                ${Number(
-                                    trip.distance_km ||
-                                    0
-                                ).toFixed(1)}
-                                km
-                                &nbsp; | &nbsp;
-                                Fuel:
-                                ${Number(
-                                    trip.fuel_needed_litres ||
-                                    0
-                                ).toFixed(1)}
-                                L
-                                &nbsp; | &nbsp;
-                                Cost:
-                                ₹${Number(
-                                    trip.total_cost ||
-                                    0
-                                ).toFixed(2)}
-                            </small>
-
-                            <br>
-
-                            <small>
-                                Safety:
-                                ${Number(
-                                    trip.safety_score ||
-                                    0
-                                )}/100
-                                &nbsp; | &nbsp;
-                                ${escapeHTML(
-                                    date
-                                )}
-                            </small>
-                        </div>
-                        `;
-
-                    tripHistory.appendChild(
-                        item
-                    );
+    routeLine =
+        L.geoJSON(
+            geometry,
+            {
+                style: {
+                    color: "#0b5ed7",
+                    weight: 6,
+                    opacity: 0.85
                 }
-            );
-
-        } catch (error) {
-
-            console.error(
-                "Supabase trip history error:",
-                error
-            );
-
-            tripHistory.innerHTML =
-                "<p style='text-align:center;'>Unable to load trip history</p>";
-        }
-    }
-
-    /* ============================================================
-       ESCAPE HTML
-    ============================================================ */
-
-    function escapeHTML(value) {
-
-        return String(value)
-
-            .replace(
-                /&/g,
-                "&amp;"
-            )
-
-            .replace(
-                /</g,
-                "&lt;"
-            )
-
-            .replace(
-                />/g,
-                "&gt;"
-            )
-
-            .replace(
-                /"/g,
-                "&quot;"
-            )
-
-            .replace(
-                /'/g,
-                "&#039;"
-            );
-    }
-
-    /* ============================================================
-       RESTORE LAST TRIP SETUP
-    ============================================================ */
-
-    function restoreLastTripSetup() {
-
-        try {
-
-            const saved =
-                JSON.parse(
-                    localStorage.getItem(
-                        "lastTripSetup"
-                    ) || "null"
-                );
-
-            if (!saved) {
-                return;
             }
+        ).addTo(map);
 
-            if (
-                destination &&
-                saved.destination
-            ) {
-                destination.value =
-                    saved.destination;
-            }
 
-            if (
-                boatType &&
-                saved.boatType
-            ) {
-                boatType.value =
-                    saved.boatType;
-            }
-
-            if (
-                fuelAvailable &&
-                saved.fuelAvailable
-            ) {
-                fuelAvailable.value =
-                    saved.fuelAvailable;
-            }
-
-            if (
-                fuelPrice &&
-                saved.fuelPrice
-            ) {
-                fuelPrice.value =
-                    saved.fuelPrice;
-            }
-
-        } catch (error) {
-
-            console.warn(
-                "Unable to restore trip setup:",
-                error
-            );
-        }
-    }
-
-    /* ============================================================
-       SAVE TRIP SETUP
-    ============================================================ */
-
-    function saveTripSetup() {
-
-        try {
-
-            localStorage.setItem(
-                "lastTripSetup",
-
-                JSON.stringify({
-
-                    destination:
-                        destination?.value ||
-                        "",
-
-                    boatType:
-                        boatType?.value ||
-                        "",
-
-                    fuelAvailable:
-                        fuelAvailable?.value ||
-                        "",
-
-                    fuelPrice:
-                        fuelPrice?.value ||
-                        ""
-                })
-            );
-
-        } catch (error) {
-
-            console.warn(
-                "Unable to save trip setup:",
-                error
-            );
-        }
-    }
-
-    [
-        destination,
-        boatType,
-        fuelAvailable,
-        fuelPrice
-    ].forEach(
-        function (element) {
-
-            if (element) {
-
-                element.addEventListener(
-                    "change",
-                    saveTripSetup
-                );
-            }
+    map.fitBounds(
+        routeLine.getBounds(),
+        {
+            padding: [
+                30,
+                30
+            ]
         }
     );
 
-    /* ============================================================
-       INITIALIZATION
-    ============================================================ */
+}
 
-    restoreLastTripSetup();
 
-    getCurrentLocation();
+// ===============================================================
+// DESTINATION MARKER
+// ===============================================================
 
-    loadTripHistory();
+function showDestinationMarker(
+    latitude,
+    longitude,
+    name
+) {
 
-});
+    if (!map) {
+        return;
+    }
+
+
+    if (destinationMarker) {
+
+        map.removeLayer(
+            destinationMarker
+        );
+
+    }
+
+
+    destinationMarker =
+        L.marker(
+            [
+                latitude,
+                longitude
+            ]
+        )
+        .addTo(map)
+        .bindPopup(
+            "<b>Destination</b><br>" +
+            escapeHTML(name)
+        );
+
+
+}
+
+
+// ===============================================================
+// DISPLAY ROUTE RESULT
+// ===============================================================
+
+function displayRouteResult(
+    result
+) {
+
+    const distance =
+        document.getElementById(
+            "distance"
+        );
+
+
+    const fuelNeed =
+        document.getElementById(
+            "fuelNeed"
+        );
+
+
+    const fuelCost =
+        document.getElementById(
+            "fuelCost"
+        );
+
+
+    const travelTime =
+        document.getElementById(
+            "travelTime"
+        );
+
+
+    const safetyScore =
+        document.getElementById(
+            "safetyScore"
+        );
+
+
+    if (distance) {
+
+        distance.textContent =
+            result.distance.toFixed(2) +
+            " km";
+
+    }
+
+
+    if (fuelNeed) {
+
+        fuelNeed.textContent =
+            result.fuelRequired.toFixed(2) +
+            " L";
+
+    }
+
+
+    if (fuelCost) {
+
+        fuelCost.textContent =
+            "₹ " +
+            result.fuelCost.toFixed(2);
+
+    }
+
+
+    if (travelTime) {
+
+        travelTime.textContent =
+            formatTravelTime(
+                result.travelTime
+            );
+
+    }
+
+
+    if (safetyScore) {
+
+        safetyScore.textContent =
+            result.safetyScore +
+            " / 100";
+
+        safetyScore.style.fontWeight =
+            "bold";
+
+
+        if (
+            result.safetyScore >= 80
+        ) {
+
+            safetyScore.style.color =
+                "#198754";
+
+        }
+
+        else if (
+            result.safetyScore >= 60
+        ) {
+
+            safetyScore.style.color =
+                "#f59f00";
+
+        }
+
+        else {
+
+            safetyScore.style.color =
+                "#dc3545";
+
+        }
+
+    }
+
+}
+
+
+// ===============================================================
+// TRAVEL TIME FORMAT
+// ===============================================================
+
+function formatTravelTime(
+    hours
+) {
+
+    const totalMinutes =
+        Math.round(
+            hours * 60
+        );
+
+
+    const h =
+        Math.floor(
+            totalMinutes / 60
+        );
+
+
+    const m =
+        totalMinutes % 60;
+
+
+    if (h > 0) {
+
+        return (
+            h +
+            " hr " +
+            m +
+            " min"
+        );
+
+    }
+
+
+    return (
+        m +
+        " min"
+    );
+
+}
+
+
+// ===============================================================
+// WEATHER
+// ===============================================================
+
+async function getWeather(
+    latitude,
+    longitude
+) {
+
+    try {
+
+        const url =
+            `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current=temperature_2m,wind_speed_10m,weather_code&timezone=auto`;
+
+
+        const response =
+            await fetch(url);
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                "Weather API error"
+            );
+
+        }
+
+
+        const data =
+            await response.json();
+
+
+        const temperature =
+            data.current?.temperature_2m;
+
+
+        const wind =
+            data.current?.wind_speed_10m;
+
+
+        const weatherCode =
+            data.current?.weather_code;
+
+
+        const temperatureElement =
+            document.getElementById(
+                "temperature"
+            );
+
+
+        const windElement =
+            document.getElementById(
+                "wind"
+            );
+
+
+        const weatherElement =
+            document.getElementById(
+                "weather"
+            );
+
+
+        const seaElement =
+            document.getElementById(
+                "sea"
+            );
+
+
+        if (temperatureElement) {
+
+            temperatureElement.textContent =
+                temperature !== undefined
+                    ? temperature + " °C"
+                    : "--";
+
+        }
+
+
+        if (windElement) {
+
+            windElement.textContent =
+                wind !== undefined
+                    ? wind + " km/h"
+                    : "--";
+
+        }
+
+
+        const weatherText =
+            getWeatherDescription(
+                weatherCode
+            );
+
+
+        if (weatherElement) {
+
+            weatherElement.textContent =
+                weatherText;
+
+        }
+
+
+        if (seaElement) {
+
+            seaElement.textContent =
+                getSeaCondition(
+                    wind
+                );
+
+        }
+
+
+        console.log(
+            "Weather:",
+            data
+        );
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "Weather Error:",
+            error
+        );
+
+
+        const weatherElement =
+            document.getElementById(
+                "weather"
+            );
+
+
+        const seaElement =
+            document.getElementById(
+                "sea"
+            );
+
+
+        if (weatherElement) {
+
+            weatherElement.textContent =
+                "Unavailable";
+
+        }
+
+
+        if (seaElement) {
+
+            seaElement.textContent =
+                "Unknown";
+
+        }
+
+    }
+
+}
+
+
+// ===============================================================
+// WEATHER DESCRIPTION
+// ===============================================================
+
+function getWeatherDescription(
+    code
+) {
+
+    const weatherCodes = {
+
+        0:
+            "Clear Sky",
+
+        1:
+            "Mainly Clear",
+
+        2:
+            "Partly Cloudy",
+
+        3:
+            "Cloudy",
+
+        45:
+            "Fog",
+
+        48:
+            "Dense Fog",
+
+        51:
+            "Light Drizzle",
+
+        53:
+            "Drizzle",
+
+        55:
+            "Heavy Drizzle",
+
+        61:
+            "Light Rain",
+
+        63:
+            "Rain",
+
+        65:
+            "Heavy Rain",
+
+        71:
+            "Light Snow",
+
+        73:
+            "Snow",
+
+        75:
+            "Heavy Snow",
+
+        80:
+            "Rain Showers",
+
+        81:
+            "Rain Showers",
+
+        82:
+            "Heavy Rain Showers",
+
+        95:
+            "Thunderstorm",
+
+        96:
+            "Thunderstorm + Hail",
+
+        99:
+            "Severe Thunderstorm"
+
+    };
+
+
+    return (
+        weatherCodes[code] ||
+        "Unknown"
+    );
+
+}
+
+
+// ===============================================================
+// SEA CONDITION
+// ===============================================================
+
+function getSeaCondition(
+    wind
+) {
+
+    if (
+        wind === undefined ||
+        wind === null
+    ) {
+
+        return "Unknown";
+
+    }
+
+
+    if (wind < 10) {
+
+        return "Calm";
+
+    }
+
+
+    if (wind < 20) {
+
+        return "Moderate";
+
+    }
+
+
+    if (wind < 30) {
+
+        return "Rough";
+
+    }
+
+
+    return "Dangerous";
+
+}
+
+
+// ===============================================================
+// SAFETY SCORE
+// ===============================================================
+
+function calculateSafetyScore() {
+
+    const weatherElement =
+        document.getElementById(
+            "weather"
+        );
+
+
+    const seaElement =
+        document.getElementById(
+            "sea"
+        );
+
+
+    let score = 100;
+
+
+    const weather =
+        weatherElement
+            ? weatherElement.textContent
+            : "";
+
+
+    const sea =
+        seaElement
+            ? seaElement.textContent
+            : "";
+
+
+    // -----------------------------------------------------------
+    // WEATHER PENALTY
+    // -----------------------------------------------------------
+
+    if (
+        weather.includes("Thunderstorm")
+    ) {
+
+        score -= 50;
+
+    }
+
+    else if (
+        weather.includes("Heavy Rain")
+    ) {
+
+        score -= 30;
+
+    }
+
+    else if (
+        weather.includes("Rain")
+    ) {
+
+        score -= 15;
+
+    }
+
+    else if (
+        weather.includes("Fog")
+    ) {
+
+        score -= 20;
+
+    }
+
+
+    // -----------------------------------------------------------
+    // SEA PENALTY
+    // -----------------------------------------------------------
+
+    if (
+        sea === "Dangerous"
+    ) {
+
+        score -= 50;
+
+    }
+
+    else if (
+        sea === "Rough"
+    ) {
+
+        score -= 30;
+
+    }
+
+    else if (
+        sea === "Moderate"
+    ) {
+
+        score -= 15;
+
+    }
+
+
+    if (score < 0) {
+
+        score = 0;
+
+    }
+
+
+    return score;
+
+}
+
+
+// ===============================================================
+// SAVE TRIP HISTORY
+// ===============================================================
+
+function saveTrip(
+    trip
+) {
+
+    try {
+
+        let history =
+            JSON.parse(
+                localStorage.getItem(
+                    "fuelTripHistory"
+                ) ||
+                "[]"
+            );
+
+
+        history.unshift({
+
+            ...trip,
+
+            date:
+                new Date().toISOString()
+
+        });
+
+
+        history =
+            history.slice(
+                0,
+                20
+            );
+
+
+        localStorage.setItem(
+            "fuelTripHistory",
+            JSON.stringify(history)
+        );
+
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "Trip History Error:",
+            error
+        );
+
+    }
+
+}
+
+
+// ===============================================================
+// LOAD TRIP HISTORY
+// ===============================================================
+
+function loadTripHistory() {
+
+    const tripHistory =
+        document.getElementById(
+            "tripHistory"
+        );
+
+
+    if (!tripHistory) {
+        return;
+    }
+
+
+    let history = [];
+
+
+    try {
+
+        history =
+            JSON.parse(
+                localStorage.getItem(
+                    "fuelTripHistory"
+                ) ||
+                "[]"
+            );
+
+    }
+
+    catch (error) {
+
+        history = [];
+
+    }
+
+
+    if (
+        history.length === 0
+    ) {
+
+        tripHistory.innerHTML =
+            `
+            <li>
+                No Trips Available
+            </li>
+            `;
+
+        return;
+
+    }
+
+
+    tripHistory.innerHTML =
+        "";
+
+
+    history
+        .slice(0, 20)
+        .forEach(
+            function (trip) {
+
+                const li =
+                    document.createElement(
+                        "li"
+                    );
+
+
+                li.innerHTML =
+                    `
+                    <strong>
+                        🛥️ ${escapeHTML(
+                            trip.destination
+                        )}
+                    </strong>
+
+                    <br>
+
+                    📏 Distance:
+                    ${Number(
+                        trip.distance
+                    ).toFixed(2)}
+                    km
+
+                    <br>
+
+                    ⛽ Fuel:
+                    ${Number(
+                        trip.fuel
+                    ).toFixed(2)}
+                    L
+
+                    <br>
+
+                    💰 Cost:
+                    ₹${Number(
+                        trip.cost
+                    ).toFixed(2)}
+
+                    <br>
+
+                    ⏱️ Time:
+                    ${formatTravelTime(
+                        Number(
+                            trip.time
+                        )
+                    )}
+
+                    <br>
+
+                    🛡️ Safety:
+                    ${trip.safety}/100
+
+                    <br>
+
+                    <small>
+                        ${formatDate(
+                            trip.date
+                        )}
+                    </small>
+                    `;
+
+
+                tripHistory.appendChild(
+                    li
+                );
+
+            }
+        );
+
+}
+
+
+// ===============================================================
+// FORMAT DATE
+// ===============================================================
+
+function formatDate(
+    value
+) {
+
+    if (!value) {
+
+        return "Recently";
+
+    }
+
+
+    const date =
+        new Date(value);
+
+
+    if (
+        isNaN(
+            date.getTime()
+        )
+    ) {
+
+        return String(value);
+
+    }
+
+
+    return date.toLocaleString();
+
+}
+
+
+// ===============================================================
+// ESCAPE HTML
+// ===============================================================
+
+function escapeHTML(
+    value
+) {
+
+    return String(
+        value ?? ""
+    )
+
+        .replace(
+            /&/g,
+            "&amp;"
+        )
+
+        .replace(
+            /</g,
+            "&lt;"
+        )
+
+        .replace(
+            />/g,
+            "&gt;"
+        )
+
+        .replace(
+            /"/g,
+            "&quot;"
+        )
+
+        .replace(
+            /'/g,
+            "&#039;"
+        );
+
+}

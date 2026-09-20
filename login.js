@@ -456,9 +456,6 @@ async function login() {
         // LOGIN SUCCESS
         // =======================================================
 
-        alert(
-            "Login Successful"
-        );
 
 
         window.location.href =
@@ -471,12 +468,6 @@ async function login() {
         console.error(
             "Login Error:",
             error
-        );
-
-
-        alert(
-            "Unable to login.\n\n" +
-            error.message
         );
 
     }

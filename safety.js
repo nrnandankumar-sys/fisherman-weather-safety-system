@@ -1,5 +1,5 @@
 // ===============================================================
-// SUPABASE
+// SAFETY CHECK - SUPABASE
 // ===============================================================
 
 import { supabase } from "./supabase-config.js";
@@ -9,169 +9,66 @@ import { supabase } from "./supabase-config.js";
 // PAGE LOAD
 // ===============================================================
 
-document.addEventListener("DOMContentLoaded", function () {
+document.addEventListener("DOMContentLoaded", async function () {
 
-    console.log("Status / History JS Loaded");
-
-
-    // ===========================================================
-    // LOGIN CHECK
-    // ===========================================================
-
-    if (
-        localStorage.getItem("isLoggedIn") !== "true"
-    ) {
-
-        alert("Please Login First");
-
-        window.location.href = "index.html";
-
-        return;
-    }
-
-
-    // ===========================================================
-    // REGISTRATION CHECK
-    // ===========================================================
-
-    const isRegistered =
-        localStorage.getItem("isRegistered") === "true";
-
-
-    if (!isRegistered) {
-
-        const register = confirm(
-            "You are not registered as a fisherman.\n\n" +
-            "Click OK to Register Now.\n" +
-            "Click Cancel for Later."
-        );
-
-
-        if (register) {
-
-            window.location.href =
-                "register.html";
-
-        } else {
-
-            window.location.href =
-                "main.html";
-        }
-
-        return;
-    }
+    console.log("Safety page loaded");
 
 
     // ===========================================================
     // CURRENT USER
     // ===========================================================
 
-    let registeredUser = null;
-
+    let currentUser = null;
 
     try {
 
-        registeredUser =
-            JSON.parse(
-                localStorage.getItem("currentUser") ||
-                "null"
-            );
+        currentUser = JSON.parse(
+            localStorage.getItem("currentUser") || "null"
+        );
 
     } catch (error) {
 
-        console.error(
-            "Current user JSON error:",
-            error
-        );
+        console.error("Current user error:", error);
 
-        registeredUser = null;
     }
 
 
-    if (!registeredUser) {
+    // ===========================================================
+    // FALLBACK USER DATA
+    // ===========================================================
 
-        registeredUser = {
+    if (!currentUser) {
+
+        currentUser = {
 
             id:
-                localStorage.getItem("user_id") ||
-                null,
+                localStorage.getItem("user_id") || "",
 
             name:
-                localStorage.getItem("user_name") ||
-                "",
+                localStorage.getItem("user_name") || "",
 
             phone:
-                localStorage.getItem("user_phone") ||
-                "",
+                localStorage.getItem("user_phone") || "",
 
             location:
-                localStorage.getItem("user_location") ||
-                ""
+                localStorage.getItem("user_location") || "",
+
+            latitude:
+                localStorage.getItem("user_latitude") || "",
+
+            longitude:
+                localStorage.getItem("user_longitude") || ""
+
         };
+
     }
 
 
-    if (
-        !registeredUser.name &&
-        !registeredUser.phone
-    ) {
-
-        alert(
-            "User information not found."
-        );
-
-        window.location.href =
-            "main.html";
-
-        return;
-    }
+    console.log("Current User:", currentUser);
 
 
     // ===========================================================
-    // NAVIGATION
-    // ===========================================================
-
-    const menuIcon =
-        document.getElementById("menuIcon");
-
-    const navLinks =
-        document.getElementById("navLinks");
-
-
-    if (
-        menuIcon &&
-        navLinks
-    ) {
-
-        menuIcon.addEventListener(
-            "click",
-            function () {
-
-                navLinks.classList.toggle(
-                    "active"
-                );
-
-            }
-        );
-    }
-
-
-    // ===========================================================
-    // BUTTONS
-    // ===========================================================
-
-    const checkBtn =
-        document.getElementById("checkBtn");
-
-    const sosBtn =
-        document.getElementById("sosBtn");
-
-    const shareBtn =
-        document.getElementById("shareBtn");
-
-
-    // ===========================================================
-    // TABS
+    // ELEMENTS
     // ===========================================================
 
     const checkTab =
@@ -184,10 +81,6 @@ document.addEventListener("DOMContentLoaded", function () {
         document.getElementById("historyTab");
 
 
-    // ===========================================================
-    // SECTIONS
-    // ===========================================================
-
     const checkSection =
         document.getElementById("checkSection");
 
@@ -198,9 +91,28 @@ document.addEventListener("DOMContentLoaded", function () {
         document.getElementById("historySection");
 
 
-    // ===========================================================
-    // STATUS ELEMENTS
-    // ===========================================================
+    const checkBtn =
+        document.getElementById("checkBtn");
+
+    const sosBtn =
+        document.getElementById("sosBtn");
+
+    const shareBtn =
+        document.getElementById("shareBtn");
+
+
+    const mobileNumber =
+        document.getElementById("mobileNumber");
+
+    const userName =
+        document.getElementById("userName");
+
+    const mobileDisplay =
+        document.getElementById("mobileDisplay");
+
+    const locationName =
+        document.getElementById("locationName");
+
 
     const statusText =
         document.getElementById("statusText");
@@ -208,266 +120,258 @@ document.addEventListener("DOMContentLoaded", function () {
     const statusTime =
         document.getElementById("statusTime");
 
-    const locationName =
-        document.getElementById("locationName");
-
-
-    // ===========================================================
-    // HISTORY
-    // ===========================================================
 
     const historyList =
         document.getElementById("historyList");
 
 
     // ===========================================================
-    // TAB DISPLAY FUNCTION
+    // MOBILE MENU
     // ===========================================================
 
-    function showTab(tabName) {
+    const menuIcon =
+        document.getElementById("menuIcon");
 
-        console.log(
-            "Opening tab:",
-            tabName
-        );
-
-
-        // -------------------------------------------------------
-        // HIDE ALL SECTIONS
-        // -------------------------------------------------------
-
-        if (checkSection) {
-
-            checkSection.style.display =
-                "none";
-
-        }
+    const navLinks =
+        document.getElementById("navLinks");
 
 
-        if (statusSection) {
+    if (menuIcon && navLinks) {
 
-            statusSection.style.display =
-                "none";
+        menuIcon.addEventListener("click", function () {
 
-        }
+            navLinks.classList.toggle("active");
 
+        });
 
-        if (historySection) {
-
-            historySection.style.display =
-                "none";
-
-        }
-
-
-        // -------------------------------------------------------
-        // REMOVE ACTIVE FROM ALL TABS
-        // -------------------------------------------------------
-
-        if (checkTab) {
-
-            checkTab.classList.remove(
-                "active"
-            );
-        }
-
-
-        if (statusTab) {
-
-            statusTab.classList.remove(
-                "active"
-            );
-        }
-
-
-        if (historyTab) {
-
-            historyTab.classList.remove(
-                "active"
-            );
-        }
-
-
-        // -------------------------------------------------------
-        // SHOW SELECTED TAB
-        // -------------------------------------------------------
-
-        if (tabName === "check") {
-
-            if (checkSection) {
-
-                checkSection.style.display =
-                    "block";
-            }
-
-
-            if (checkTab) {
-
-                checkTab.classList.add(
-                    "active"
-                );
-            }
-        }
-
-
-        // -------------------------------------------------------
-
-        else if (
-            tabName === "status"
-        ) {
-
-            if (statusSection) {
-
-                statusSection.style.display =
-                    "block";
-            }
-
-
-            if (statusTab) {
-
-                statusTab.classList.add(
-                    "active"
-                );
-            }
-
-
-            // Load latest status
-            loadLatestStatus();
-        }
-
-
-        // -------------------------------------------------------
-
-        else if (
-            tabName === "history"
-        ) {
-
-            if (historySection) {
-
-                historySection.style.display =
-                    "block";
-            }
-
-
-            if (historyTab) {
-
-                historyTab.classList.add(
-                    "active"
-                );
-            }
-
-
-            // Load history
-            loadHistory();
-        }
     }
 
 
     // ===========================================================
-    // CHECK TAB
+    // LOAD USER INFORMATION
     // ===========================================================
 
-    if (checkTab) {
+    function loadUserInfo() {
 
-        checkTab.addEventListener(
-            "click",
-            function (event) {
+        const name =
+            currentUser.name || "Not Registered";
 
-                event.preventDefault();
+        const phone =
+            currentUser.phone || "Not Registered";
 
-                showTab("check");
-
-            }
-        );
-    }
-
-
-    // ===========================================================
-    // STATUS TAB
-    // ===========================================================
-
-    if (statusTab) {
-
-        statusTab.addEventListener(
-            "click",
-            function (event) {
-
-                event.preventDefault();
-
-                showTab("status");
-
-            }
-        );
-    }
-
-
-    // ===========================================================
-    // HISTORY TAB
-    // ===========================================================
-
-    if (historyTab) {
-
-        historyTab.addEventListener(
-            "click",
-            function (event) {
-
-                event.preventDefault();
-
-                showTab("history");
-
-            }
-        );
-    }
-
-
-    // ===========================================================
-    // LOAD USER
-    // ===========================================================
-
-    function loadUser() {
-
-        const user =
-            registeredUser;
-
-
-        const mobileNumber =
-            document.getElementById(
-                "mobileNumber"
-            );
-
-
-        const userName =
-            document.getElementById(
-                "userName"
-            );
-
-
-        const mobileDisplay =
-            document.getElementById(
-                "mobileDisplay"
-            );
+        const location =
+            currentUser.location || "Waiting...";
 
 
         if (mobileNumber) {
 
-            mobileNumber.textContent =
-                user.phone || "Not Registered";
+            mobileNumber.textContent = phone;
+
         }
 
 
         if (userName) {
 
-            userName.textContent =
-                user.name || "";
+            userName.textContent = name;
+
         }
 
 
         if (mobileDisplay) {
 
-            mobileDisplay.textContent =
-                user.phone ||
-                "Not Registered";
+            mobileDisplay.textContent = phone;
+
         }
+
+
+        if (locationName) {
+
+            locationName.textContent = location;
+
+        }
+
+    }
+
+
+    // ===========================================================
+    // TAB FUNCTION
+    // ===========================================================
+
+    function showTab(tab) {
+
+        console.log("Showing tab:", tab);
+
+
+        // -------------------------------------------------------
+        // HIDE ALL
+        // -------------------------------------------------------
+
+        checkSection.style.display = "none";
+
+        statusSection.style.display = "none";
+
+        historySection.style.display = "none";
+
+
+        // -------------------------------------------------------
+        // REMOVE ACTIVE
+        // -------------------------------------------------------
+
+        checkTab.classList.remove("active");
+
+        statusTab.classList.remove("active");
+
+        historyTab.classList.remove("active");
+
+
+        // -------------------------------------------------------
+        // CHECK
+        // -------------------------------------------------------
+
+        if (tab === "check") {
+
+            checkSection.style.display = "block";
+
+            checkTab.classList.add("active");
+
+        }
+
+
+        // -------------------------------------------------------
+        // STATUS
+        // -------------------------------------------------------
+
+        else if (tab === "status") {
+
+            statusSection.style.display = "block";
+
+            statusTab.classList.add("active");
+
+            loadStatus();
+
+        }
+
+
+        // -------------------------------------------------------
+        // HISTORY
+        // -------------------------------------------------------
+
+        else if (tab === "history") {
+
+            historySection.style.display = "block";
+
+            historyTab.classList.add("active");
+
+            loadHistory();
+
+        }
+
+    }
+
+
+    // ===========================================================
+    // CHECK TAB CLICK
+    // ===========================================================
+
+    checkTab.addEventListener("click", function (event) {
+
+        event.preventDefault();
+
+        showTab("check");
+
+    });
+
+
+    // ===========================================================
+    // STATUS TAB CLICK
+    // ===========================================================
+
+    statusTab.addEventListener("click", function (event) {
+
+        event.preventDefault();
+
+        showTab("status");
+
+    });
+
+
+    // ===========================================================
+    // HISTORY TAB CLICK
+    // ===========================================================
+
+    historyTab.addEventListener("click", function (event) {
+
+        event.preventDefault();
+
+        showTab("history");
+
+    });
+
+
+    // ===========================================================
+    // GET LOCATION NAME
+    // ===========================================================
+
+    async function getLocationName(latitude, longitude) {
+
+        try {
+
+            const response = await fetch(
+                `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=18&addressdetails=1`,
+                {
+                    headers: {
+                        "Accept": "application/json"
+                    }
+                }
+            );
+
+
+            if (!response.ok) {
+
+                throw new Error(
+                    "Location service failed"
+                );
+
+            }
+
+
+            const data =
+                await response.json();
+
+
+            return (
+
+                data.address?.village ||
+
+                data.address?.town ||
+
+                data.address?.city ||
+
+                data.address?.municipality ||
+
+                data.address?.county ||
+
+                data.address?.state ||
+
+                data.display_name ||
+
+                "Unknown"
+
+            );
+
+        }
+
+        catch (error) {
+
+            console.error(
+                "Reverse geocoding error:",
+                error
+            );
+
+            return "Unknown";
+
+        }
+
     }
 
 
@@ -481,42 +385,21 @@ document.addEventListener("DOMContentLoaded", function () {
             "click",
             function () {
 
-                const user =
-                    registeredUser;
-
-
-                if (!user) {
+                if (!navigator.geolocation) {
 
                     alert(
-                        "Please Register First"
+                        "Geolocation is not supported."
                     );
 
                     return;
+
                 }
 
 
-                if (
-                    !navigator.geolocation
-                ) {
-
-                    alert(
-                        "Geolocation not supported"
-                    );
-
-                    return;
-                }
-
-
-                const now =
-                    new Date().toLocaleString();
-
-
-                checkBtn.disabled =
-                    true;
-
+                checkBtn.disabled = true;
 
                 checkBtn.innerHTML =
-                    "Checking...";
+                    "CHECKING LOCATION...";
 
 
                 navigator.geolocation.getCurrentPosition(
@@ -526,176 +409,164 @@ document.addEventListener("DOMContentLoaded", function () {
                         const latitude =
                             position.coords.latitude;
 
-
                         const longitude =
                             position.coords.longitude;
 
 
+                        const location =
+                            await getLocationName(
+                                latitude,
+                                longitude
+                            );
+
+
+                        const time =
+                            new Date().toISOString();
+
+
                         // ------------------------------------------------
-                        // UPDATE STATUS
+                        // UPDATE USER
                         // ------------------------------------------------
 
-                        updateStatusUI(
-                            "SAFE",
-                            now,
-                            "#00e676"
+                        currentUser.latitude =
+                            latitude;
+
+                        currentUser.longitude =
+                            longitude;
+
+                        currentUser.location =
+                            location;
+
+
+                        localStorage.setItem(
+                            "currentUser",
+                            JSON.stringify(currentUser)
+                        );
+
+
+                        localStorage.setItem(
+                            "user_latitude",
+                            latitude
+                        );
+
+
+                        localStorage.setItem(
+                            "user_longitude",
+                            longitude
+                        );
+
+
+                        localStorage.setItem(
+                            "user_location",
+                            location
                         );
 
 
                         // ------------------------------------------------
-                        // GET LOCATION NAME
-                        // ------------------------------------------------
-
-                        let place =
-                            "Unknown";
-
-
-                        try {
-
-                            const response =
-                                await fetch(
-                                    `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=18&addressdetails=1`,
-                                    {
-                                        headers: {
-                                            "Accept":
-                                                "application/json"
-                                        }
-                                    }
-                                );
-
-
-                            if (
-                                !response.ok
-                            ) {
-
-                                throw new Error(
-                                    "Unable to get location"
-                                );
-                            }
-
-
-                            const data =
-                                await response.json();
-
-
-                            place =
-                                data.address?.city ||
-
-                                data.address?.town ||
-
-                                data.address?.village ||
-
-                                data.address?.municipality ||
-
-                                data.address?.county ||
-
-                                data.address?.state ||
-
-                                data.display_name ||
-
-                                "Unknown";
-
-
-                        } catch (error) {
-
-                            console.error(
-                                "Location Error:",
-                                error
-                            );
-
-                            place =
-                                "Unknown";
-                        }
-
-
-                        // ------------------------------------------------
-                        // LOCATION DISPLAY
+                        // DISPLAY
                         // ------------------------------------------------
 
                         if (locationName) {
 
                             locationName.textContent =
-                                place;
+                                location;
+
+                        }
+
+
+                        if (statusText) {
+
+                            statusText.textContent =
+                                "SAFE";
+
+                            statusText.style.color =
+                                "#00e676";
+
+                        }
+
+
+                        if (statusTime) {
+
+                            statusTime.textContent =
+                                "Last Check-in : " +
+                                new Date(time)
+                                    .toLocaleString();
+
                         }
 
 
                         // ------------------------------------------------
-                        // SAVE LOCAL HISTORY
+                        // SAVE HISTORY
                         // ------------------------------------------------
 
-                        saveHistory(
-                            "SAFE",
-                            place,
-                            now
-                        );
+                        saveLocalHistory({
+
+                            status: "SAFE",
+
+                            location: location,
+
+                            time: time
+
+                        });
 
 
-                        // ------------------------------------------------
-                        // SAVE LOCATION
-                        // ------------------------------------------------
-
-                        localStorage.setItem(
-                            "last_checkin_latitude",
-                            String(latitude)
-                        );
-
-
-                        localStorage.setItem(
-                            "last_checkin_longitude",
-                            String(longitude)
-                        );
-
-
-                        localStorage.setItem(
-                            "last_checkin_location",
-                            place
-                        );
-
-
-                        checkBtn.disabled =
-                            false;
-
+                        checkBtn.disabled = false;
 
                         checkBtn.innerHTML =
-                            "CHECK-IN NOW";
+                            '<i class="fa-solid fa-shield-heart"></i> CHECK-IN NOW';
+
+
+                        alert(
+                            "Check-in Successful!\n\n" +
+                            "Location: " +
+                            location
+                        );
+
                     },
 
 
                     function (error) {
 
                         console.error(
-                            "Geolocation Error:",
+                            "GPS Error:",
                             error
                         );
 
 
                         alert(
-                            "Unable to get your location."
+                            "Unable to get your current location.\n\n" +
+                            "Please allow location permission."
                         );
 
 
-                        checkBtn.disabled =
-                            false;
-
+                        checkBtn.disabled = false;
 
                         checkBtn.innerHTML =
-                            "CHECK-IN NOW";
+                            '<i class="fa-solid fa-shield-heart"></i> CHECK-IN NOW';
+
                     },
 
 
                     {
+
                         enableHighAccuracy: true,
+
                         timeout: 15000,
+
                         maximumAge: 0
+
                     }
+
                 );
+
             }
         );
+
     }
 
 
     // ===========================================================
-    // SOS
+    // SOS BUTTON
     // ===========================================================
 
     if (sosBtn) {
@@ -704,35 +575,30 @@ document.addEventListener("DOMContentLoaded", function () {
             "click",
             async function () {
 
-                const user =
-                    registeredUser;
-
-
-                if (!user) {
+                if (!currentUser.name &&
+                    !currentUser.phone) {
 
                     alert(
-                        "Please Register First"
+                        "User information not found."
                     );
 
                     return;
+
                 }
 
 
-                if (
-                    !navigator.geolocation
-                ) {
+                if (!navigator.geolocation) {
 
                     alert(
-                        "Geolocation not supported"
+                        "Geolocation is not supported."
                     );
 
                     return;
+
                 }
 
 
-                sosBtn.disabled =
-                    true;
-
+                sosBtn.disabled = true;
 
                 sosBtn.innerHTML =
                     "SENDING SOS...";
@@ -745,123 +611,68 @@ document.addEventListener("DOMContentLoaded", function () {
                         const latitude =
                             position.coords.latitude;
 
-
                         const longitude =
                             position.coords.longitude;
 
 
-                        let location =
-                            "Unknown";
-
-
-                        // ------------------------------------------------
-                        // GET LOCATION
-                        // ------------------------------------------------
-
-                        try {
-
-                            const response =
-                                await fetch(
-                                    `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=18&addressdetails=1`,
-                                    {
-                                        headers: {
-                                            "Accept":
-                                                "application/json"
-                                        }
-                                    }
-                                );
-
-
-                            if (
-                                response.ok
-                            ) {
-
-                                const data =
-                                    await response.json();
-
-
-                                location =
-                                    data.address?.city ||
-
-                                    data.address?.town ||
-
-                                    data.address?.village ||
-
-                                    data.address?.municipality ||
-
-                                    data.address?.county ||
-
-                                    data.address?.state ||
-
-                                    data.display_name ||
-
-                                    "Unknown";
-                            }
-
-                        } catch (error) {
-
-                            console.error(
-                                "Reverse geocoding error:",
-                                error
-                            );
-                        }
-
-
-                        // ------------------------------------------------
-                        // SAVE SOS TO SUPABASE
-                        // IMPORTANT:
-                        // NO .select().single()
-                        // ------------------------------------------------
-
-                        try {
-
-                            const sosData = {
-
-                                name:
-                                    user.name ||
-                                    localStorage.getItem(
-                                        "user_name"
-                                    ) ||
-                                    "",
-
-                                phone:
-                                    user.phone ||
-                                    localStorage.getItem(
-                                        "user_phone"
-                                    ) ||
-                                    "",
-
-                                location:
-                                    location,
-
-                                latitude:
-                                    latitude,
-
-                                longitude:
-                                    longitude,
-
-                                status:
-                                    "Emergency Requested",
-
-                                message:
-                                    "SOS Emergency Alert",
-
-                                time:
-                                    new Date().toISOString(),
-
-                                created_at:
-                                    new Date().toISOString(),
-
-                                updated_at:
-                                    new Date().toISOString()
-                            };
-
-
-                            console.log(
-                                "SOS Data:",
-                                sosData
+                        const location =
+                            await getLocationName(
+                                latitude,
+                                longitude
                             );
 
+
+                        const now =
+                            new Date().toISOString();
+
+
+                        const sosData = {
+
+                            user_id:
+                                currentUser.id
+                                    ? Number(currentUser.id)
+                                    : null,
+
+                            name:
+                                currentUser.name || "",
+
+                            phone:
+                                currentUser.phone || "",
+
+                            location:
+                                location,
+
+                            latitude:
+                                latitude,
+
+                            longitude:
+                                longitude,
+
+                            status:
+                                "Emergency Requested",
+
+                            message:
+                                "SOS Emergency Alert",
+
+                            time:
+                                now,
+
+                            created_at:
+                                now,
+
+                            updated_at:
+                                now
+
+                        };
+
+
+                        console.log(
+                            "SOS Data:",
+                            sosData
+                        );
+
+
+                        try {
 
                             const {
                                 error
@@ -878,40 +689,18 @@ document.addEventListener("DOMContentLoaded", function () {
                             if (error) {
 
                                 console.error(
-                                    "Supabase SOS Error:",
+                                    "Supabase error:",
                                     error
                                 );
 
                                 throw error;
+
                             }
 
 
-                            // ------------------------------------------------
-                            // UPDATE STATUS
-                            // ------------------------------------------------
-
-                            updateStatusUI(
-                                "SOS SENT",
-                                "Emergency Requested : " +
-                                new Date().toLocaleString(),
-                                "#ff3333"
-                            );
-
-
-                            // ------------------------------------------------
-                            // SAVE HISTORY
-                            // ------------------------------------------------
-
-                            saveHistory(
-                                "SOS SENT",
-                                location,
-                                new Date().toLocaleString()
-                            );
-
-
-                            // ------------------------------------------------
-                            // SAVE LOCAL SOS DATA
-                            // ------------------------------------------------
+                            // ---------------------------------------------
+                            // LOCAL SAVE
+                            // ---------------------------------------------
 
                             localStorage.setItem(
                                 "lastSOSStatus",
@@ -927,27 +716,76 @@ document.addEventListener("DOMContentLoaded", function () {
 
                             localStorage.setItem(
                                 "lastSOSLatitude",
-                                String(latitude)
+                                latitude
                             );
 
 
                             localStorage.setItem(
                                 "lastSOSLongitude",
-                                String(longitude)
+                                longitude
                             );
 
 
+                            saveLocalHistory({
+
+                                status:
+                                    "Emergency Requested",
+
+                                location:
+                                    location,
+
+                                time:
+                                    now
+
+                            });
+
+
+                            // ---------------------------------------------
+                            // UPDATE USER STATUS
+                            // ---------------------------------------------
+
+                            if (statusText) {
+
+                                statusText.textContent =
+                                    "🚨 SOS SENT";
+
+                                statusText.style.color =
+                                    "#ff3333";
+
+                            }
+
+
+                            if (statusTime) {
+
+                                statusTime.textContent =
+                                    "Emergency Requested : " +
+                                    new Date()
+                                        .toLocaleString();
+
+                            }
+
+
+                            if (locationName) {
+
+                                locationName.textContent =
+                                    location;
+
+                            }
+
+
                             alert(
-                                "SOS Alert Sent Successfully\n\n" +
+                                "SOS Alert Sent Successfully!\n\n" +
                                 "Location: " +
                                 location
                             );
 
 
-                        } catch (error) {
+                        }
+
+                        catch (error) {
 
                             console.error(
-                                "SOS Error:",
+                                "SOS error:",
                                 error
                             );
 
@@ -956,54 +794,59 @@ document.addEventListener("DOMContentLoaded", function () {
                                 "Unable to send SOS alert.\n\n" +
                                 "Error: " +
                                 (
-                                    error?.message ||
+                                    error.message ||
                                     "Unknown error"
                                 )
                             );
 
-
-                        } finally {
-
-                            sosBtn.disabled =
-                                false;
-
-
-                            sosBtn.innerHTML =
-                                "SEND SOS ALERT";
                         }
+
+
+                        sosBtn.disabled = false;
+
+                        sosBtn.innerHTML =
+                            '<i class="fa-solid fa-triangle-exclamation"></i> SEND SOS ALERT';
+
                     },
 
 
                     function (error) {
 
                         console.error(
-                            "Geolocation Error:",
+                            "Location error:",
                             error
                         );
 
 
                         alert(
-                            "Unable to fetch your location."
+                            "Unable to get your current location.\n\n" +
+                            "Please allow GPS permission."
                         );
 
 
-                        sosBtn.disabled =
-                            false;
-
+                        sosBtn.disabled = false;
 
                         sosBtn.innerHTML =
-                            "SEND SOS ALERT";
+                            '<i class="fa-solid fa-triangle-exclamation"></i> SEND SOS ALERT';
+
                     },
 
 
                     {
+
                         enableHighAccuracy: true,
+
                         timeout: 15000,
+
                         maximumAge: 0
+
                     }
+
                 );
+
             }
         );
+
     }
 
 
@@ -1017,21 +860,18 @@ document.addEventListener("DOMContentLoaded", function () {
             "click",
             function () {
 
-                if (
-                    !navigator.geolocation
-                ) {
+                if (!navigator.geolocation) {
 
                     alert(
-                        "Geolocation not supported"
+                        "Geolocation is not supported."
                     );
 
                     return;
+
                 }
 
 
-                shareBtn.disabled =
-                    true;
-
+                shareBtn.disabled = true;
 
                 shareBtn.innerHTML =
                     "GETTING LOCATION...";
@@ -1041,18 +881,17 @@ document.addEventListener("DOMContentLoaded", function () {
 
                     function (position) {
 
-                        const lat =
+                        const latitude =
                             position.coords.latitude
                                 .toFixed(6);
 
-
-                        const lon =
+                        const longitude =
                             position.coords.longitude
                                 .toFixed(6);
 
 
-                        const link =
-                            `https://www.google.com/maps?q=${lat},${lon}`;
+                        const mapLink =
+                            `https://www.google.com/maps?q=${latitude},${longitude}`;
 
 
                         if (
@@ -1060,165 +899,165 @@ document.addEventListener("DOMContentLoaded", function () {
                         ) {
 
                             navigator.clipboard
-                                .writeText(link)
+                                .writeText(mapLink)
                                 .then(
                                     function () {
 
                                         alert(
-                                            "Location Copied\n\n" +
-                                            link
+                                            "Location link copied!\n\n" +
+                                            mapLink
                                         );
+
                                     }
                                 )
                                 .catch(
                                     function () {
 
-                                        alert(link);
+                                        alert(
+                                            mapLink
+                                        );
+
                                     }
                                 );
 
-                        } else {
+                        }
 
-                            alert(link);
+                        else {
+
+                            alert(
+                                mapLink
+                            );
+
                         }
 
 
-                        shareBtn.disabled =
-                            false;
-
+                        shareBtn.disabled = false;
 
                         shareBtn.innerHTML =
-                            "SHARE LOCATION";
+                            '<i class="fa-solid fa-location-dot"></i> SHARE LOCATION';
+
                     },
 
 
                     function (error) {
 
                         console.error(
-                            "Share location error:",
+                            "Location error:",
                             error
                         );
 
 
                         alert(
-                            "Unable to fetch your location."
+                            "Unable to get your location."
                         );
 
 
-                        shareBtn.disabled =
-                            false;
-
+                        shareBtn.disabled = false;
 
                         shareBtn.innerHTML =
-                            "SHARE LOCATION";
+                            '<i class="fa-solid fa-location-dot"></i> SHARE LOCATION';
+
                     },
 
 
                     {
+
                         enableHighAccuracy: true,
+
                         timeout: 15000,
+
                         maximumAge: 0
+
                     }
+
                 );
+
             }
         );
+
     }
 
 
     // ===========================================================
-    // UPDATE STATUS UI
+    // SAVE LOCAL HISTORY
     // ===========================================================
 
-    function updateStatusUI(
-        status,
-        time,
-        color
-    ) {
+    function saveLocalHistory(item) {
 
-        if (statusText) {
+        let history = [];
 
-            statusText.textContent =
-                status;
 
-            statusText.style.color =
-                color;
+        try {
+
+            history =
+                JSON.parse(
+                    localStorage.getItem(
+                        "smsHistory"
+                    ) || "[]"
+                );
+
+        }
+
+        catch (error) {
+
+            history = [];
+
         }
 
 
-        if (statusTime) {
-
-            statusTime.textContent =
-                time;
-        }
-    }
+        history.unshift(item);
 
 
-    // ===========================================================
-    // LOAD LATEST STATUS FROM SUPABASE
-    // ===========================================================
+        history =
+            history.slice(0, 30);
 
-    async function loadLatestStatus() {
 
-        console.log(
-            "Loading latest emergency status..."
+        localStorage.setItem(
+            "smsHistory",
+            JSON.stringify(history)
         );
 
+    }
 
-        // -------------------------------------------------------
-        // SHOW LOADING
-        // -------------------------------------------------------
+
+    // ===========================================================
+    // LOAD STATUS
+    // ===========================================================
+
+    async function loadStatus() {
 
         if (statusText) {
 
             statusText.textContent =
                 "Loading...";
 
-            statusText.style.color =
-                "#ffffff";
         }
 
 
-        if (statusTime) {
+        const phone =
+            currentUser.phone ||
+            localStorage.getItem("user_phone");
 
-            statusTime.textContent =
-                "Checking latest status...";
+
+        if (!phone) {
+
+            showLocalStatus();
+
+            return;
+
         }
 
 
         try {
-
-            const phone =
-                registeredUser.phone ||
-                localStorage.getItem(
-                    "user_phone"
-                );
-
-
-            if (!phone) {
-
-                throw new Error(
-                    "Phone number not found"
-                );
-            }
-
-
-            // ---------------------------------------------------
-            // GET LATEST EMERGENCY
-            // ---------------------------------------------------
 
             const {
                 data,
                 error
             } =
                 await supabase
-                    .from(
-                        "emergency_alerts"
-                    )
+                    .from("emergency_alerts")
                     .select("*")
-                    .eq(
-                        "phone",
-                        phone
-                    )
+                    .eq("phone", phone)
                     .order(
                         "created_at",
                         {
@@ -1231,314 +1070,129 @@ document.addEventListener("DOMContentLoaded", function () {
             if (error) {
 
                 throw error;
+
             }
 
-
-            // ---------------------------------------------------
-            // NO EMERGENCY
-            // ---------------------------------------------------
 
             if (
-                !data ||
-                data.length === 0
+                data &&
+                data.length > 0
             ) {
 
-                const savedStatus =
-                    localStorage.getItem(
-                        "lastSOSStatus"
-                    );
+                const emergency =
+                    data[0];
 
 
-                if (savedStatus) {
+                displayStatus(
 
-                    displayEmergencyStatus(
-                        savedStatus,
-                        localStorage.getItem(
-                            "lastSOSLocation"
-                        ) ||
-                        "Unknown",
-                        "Recently"
-                    );
+                    emergency.status ||
+                    "Emergency Requested",
 
-                } else {
+                    emergency.location ||
+                    "Unknown",
 
-                    updateStatusUI(
-                        "SAFE",
-                        "No emergency request found",
-                        "#00e676"
-                    );
-                }
+                    emergency.updated_at ||
+                    emergency.created_at
 
+                );
 
-                return;
             }
 
+            else {
 
-            // ---------------------------------------------------
-            // LATEST EMERGENCY
-            // ---------------------------------------------------
+                showLocalStatus();
 
-            const emergency =
-                data[0];
+            }
 
+        }
 
-            displayEmergencyStatus(
-                emergency.status ||
-                "Emergency Requested",
-
-                emergency.location ||
-                "Unknown",
-
-                emergency.updated_at ||
-                emergency.created_at
-            );
-
-
-        } catch (error) {
+        catch (error) {
 
             console.error(
-                "Load status error:",
+                "Status loading error:",
                 error
             );
 
 
-            // ---------------------------------------------------
-            // FALLBACK LOCAL STATUS
-            // ---------------------------------------------------
+            showLocalStatus();
 
-            const savedStatus =
-                localStorage.getItem(
-                    "lastSOSStatus"
-                );
-
-
-            if (savedStatus) {
-
-                displayEmergencyStatus(
-                    savedStatus,
-
-                    localStorage.getItem(
-                        "lastSOSLocation"
-                    ) ||
-                    "Unknown",
-
-                    "Recently"
-                );
-
-            } else {
-
-                updateStatusUI(
-                    "SAFE",
-                    "Unable to load latest status",
-                    "#00e676"
-                );
-            }
         }
+
     }
 
 
     // ===========================================================
-    // DISPLAY EMERGENCY STATUS
+    // LOCAL STATUS
     // ===========================================================
 
-    function displayEmergencyStatus(
+    function showLocalStatus() {
+
+        const savedStatus =
+            localStorage.getItem(
+                "lastSOSStatus"
+            );
+
+
+        const savedLocation =
+            localStorage.getItem(
+                "lastSOSLocation"
+            );
+
+
+        if (savedStatus) {
+
+            displayStatus(
+
+                savedStatus,
+
+                savedLocation ||
+                "Unknown",
+
+                "Recently"
+
+            );
+
+        }
+
+        else {
+
+            if (statusText) {
+
+                statusText.textContent =
+                    "SAFE";
+
+                statusText.style.color =
+                    "#00e676";
+
+            }
+
+
+            if (statusTime) {
+
+                statusTime.textContent =
+                    "No emergency request found";
+
+            }
+
+        }
+
+    }
+
+
+    // ===========================================================
+    // DISPLAY STATUS
+    // ===========================================================
+
+    function displayStatus(
         status,
         location,
         time
     ) {
 
-        let color =
-            "#00e676";
+        let color = "#00e676";
 
 
-        let icon =
-            "🟢";
-
-
-        switch (status) {
-
-            case "Emergency Requested":
-
-                color =
-                    "#ff3333";
-
-                icon =
-                    "🚨";
-
-                break;
-
-
-            case "Under Review":
-
-                color =
-                    "#ff9800";
-
-                icon =
-                    "🔎";
-
-                break;
-
-
-            case "Rescue in Progress":
-
-                color =
-                    "#ff5722";
-
-                icon =
-                    "🚑";
-
-                break;
-
-
-            case "Safe to Return":
-
-                color =
-                    "#00e676";
-
-                icon =
-                    "🟢";
-
-                break;
-
-
-            case "Resolved":
-
-                color =
-                    "#00e676";
-
-                icon =
-                    "✅";
-
-                break;
-
-
-            case "SOS SENT":
-
-                color =
-                    "#ff3333";
-
-                icon =
-                    "🚨";
-
-                break;
-
-
-            case "SAFE":
-
-                color =
-                    "#00e676";
-
-                icon =
-                    "🟢";
-
-                break;
-        }
-
-
-        if (statusText) {
-
-            statusText.innerHTML =
-                icon +
-                " " +
-                escapeHTML(status);
-
-            statusText.style.color =
-                color;
-        }
-
-
-        if (statusTime) {
-
-            statusTime.innerHTML =
-                "Status Updated : " +
-                escapeHTML(
-                    formatDate(time)
-                );
-        }
-
-
-        if (locationName) {
-
-            locationName.innerHTML =
-                "📍 " +
-                escapeHTML(
-                    location ||
-                    "Unknown"
-                );
-        }
-
-
-        // -------------------------------------------------------
-        // EXTRA STATUS INFORMATION
-        // -------------------------------------------------------
-
-        showStatusDetails(
-            status,
-            location
-        );
-    }
-
-
-    // ===========================================================
-    // STATUS DETAILS
-    // ===========================================================
-
-    function showStatusDetails(
-        status,
-        location
-    ) {
-
-        let statusDetails =
-            document.getElementById(
-                "statusDetails"
-            );
-
-
-        if (!statusDetails) {
-
-            if (!statusSection) {
-                return;
-            }
-
-
-            statusDetails =
-                document.createElement(
-                    "div"
-                );
-
-
-            statusDetails.id =
-                "statusDetails";
-
-
-            statusDetails.style.marginTop =
-                "20px";
-
-
-            statusDetails.style.padding =
-                "18px";
-
-
-            statusDetails.style.borderRadius =
-                "12px";
-
-
-            statusDetails.style.background =
-                "rgba(0,0,0,0.20)";
-
-
-            statusDetails.style.border =
-                "1px solid rgba(255,255,255,0.15)";
-
-
-            statusSection.appendChild(
-                statusDetails
-            );
-        }
-
-
-        let message =
-            "";
+        let icon = "🟢";
 
 
         if (
@@ -1546,8 +1200,9 @@ document.addEventListener("DOMContentLoaded", function () {
             "Emergency Requested"
         ) {
 
-            message =
-                "🚨 Emergency request has been received. Please stay calm and wait for admin/rescue updates.";
+            color = "#ff3333";
+
+            icon = "🚨";
 
         }
 
@@ -1556,8 +1211,9 @@ document.addEventListener("DOMContentLoaded", function () {
             "Under Review"
         ) {
 
-            message =
-                "🔎 Your emergency request is currently under review by the admin.";
+            color = "#ff9800";
+
+            icon = "🔎";
 
         }
 
@@ -1566,8 +1222,9 @@ document.addEventListener("DOMContentLoaded", function () {
             "Rescue in Progress"
         ) {
 
-            message =
-                "🚑 Rescue operation is currently in progress.";
+            color = "#ff5722";
+
+            icon = "🚑";
 
         }
 
@@ -1576,8 +1233,9 @@ document.addEventListener("DOMContentLoaded", function () {
             "Safe to Return"
         ) {
 
-            message =
-                "🟢 Admin has updated the status. It is safe to return.";
+            color = "#00e676";
+
+            icon = "🟢";
 
         }
 
@@ -1586,106 +1244,40 @@ document.addEventListener("DOMContentLoaded", function () {
             "Resolved"
         ) {
 
-            message =
-                "✅ Emergency has been resolved.";
+            color = "#00e676";
+
+            icon = "✅";
 
         }
 
-        else {
 
-            message =
-                "🟢 No active emergency request.";
+        if (statusText) {
+
+            statusText.textContent =
+                icon + " " + status;
+
+            statusText.style.color =
+                color;
+
         }
 
 
-        statusDetails.innerHTML =
-            `
-            <h3 style="
-                margin-top:0;
-                margin-bottom:10px;
-            ">
-                Current Safety Status
-            </h3>
+        if (statusTime) {
 
-            <p>
-                ${escapeHTML(message)}
-            </p>
+            statusTime.textContent =
+                "Status Updated : " +
+                formatDate(time);
 
-            <p>
-                📍 <strong>Location:</strong>
-                ${escapeHTML(
-                    location ||
-                    "Unknown"
-                )}
-            </p>
-            `;
-    }
-
-
-    // ===========================================================
-    // SAVE HISTORY
-    // ===========================================================
-
-    function saveHistory(
-        status,
-        location,
-        time
-    ) {
-
-        try {
-
-            let history =
-                JSON.parse(
-                    localStorage.getItem(
-                        "smsHistory"
-                    ) ||
-                    "[]"
-                );
-
-
-            history.unshift({
-
-                status:
-                    status,
-
-                location:
-                    location,
-
-                time:
-                    time
-            });
-
-
-            if (
-                history.length > 20
-            ) {
-
-                history =
-                    history.slice(
-                        0,
-                        20
-                    );
-            }
-
-
-            localStorage.setItem(
-                "smsHistory",
-                JSON.stringify(history)
-            );
-
-
-            console.log(
-                "History saved:",
-                history
-            );
-
-        } catch (error) {
-
-            console.error(
-                "Save history error:",
-                error
-            );
         }
+
+
+        if (locationName) {
+
+            locationName.textContent =
+                location || "Unknown";
+
+        }
+
     }
 
 
@@ -1697,26 +1289,20 @@ document.addEventListener("DOMContentLoaded", function () {
 
         if (!historyList) {
 
-            console.warn(
-                "historyList element not found"
-            );
-
             return;
+
         }
 
 
         historyList.innerHTML =
             `
-            <li style="
-                text-align:center;
-                padding:15px;
-            ">
+            <li>
                 Loading history...
             </li>
             `;
 
 
-        let localHistory = [];
+        let allHistory = [];
 
 
         // -------------------------------------------------------
@@ -1725,179 +1311,115 @@ document.addEventListener("DOMContentLoaded", function () {
 
         try {
 
-            localHistory =
+            const localHistory =
                 JSON.parse(
                     localStorage.getItem(
                         "smsHistory"
-                    ) ||
-                    "[]"
+                    ) || "[]"
                 );
 
-        } catch (error) {
+
+            allHistory =
+                allHistory.concat(
+                    localHistory
+                );
+
+        }
+
+        catch (error) {
 
             console.error(
                 "Local history error:",
                 error
             );
 
-            localHistory = [];
         }
 
 
         // -------------------------------------------------------
-        // SUPABASE EMERGENCY HISTORY
+        // SUPABASE HISTORY
         // -------------------------------------------------------
 
-        let emergencyHistory = [];
+        const phone =
+            currentUser.phone ||
+            localStorage.getItem("user_phone");
 
 
-        try {
+        if (phone) {
 
-            const phone =
-                registeredUser.phone ||
-                localStorage.getItem(
-                    "user_phone"
-                );
-
-
-            if (phone) {
+            try {
 
                 const {
                     data,
                     error
                 } =
                     await supabase
-                        .from(
-                            "emergency_alerts"
-                        )
+                        .from("emergency_alerts")
                         .select(
                             "status,location,created_at,updated_at"
                         )
-                        .eq(
-                            "phone",
-                            phone
-                        )
+                        .eq("phone", phone)
                         .order(
                             "created_at",
                             {
                                 ascending: false
                             }
                         )
-                        .limit(20);
+                        .limit(30);
 
 
                 if (!error && data) {
 
-                    emergencyHistory =
-                        data.map(
-                            function (item) {
+                    data.forEach(
+                        function (item) {
 
-                                return {
+                            allHistory.push({
 
-                                    status:
-                                        item.status ||
-                                        "Emergency",
+                                status:
+                                    item.status ||
+                                    "Emergency",
 
-                                    location:
-                                        item.location ||
-                                        "Unknown",
+                                location:
+                                    item.location ||
+                                    "Unknown",
 
-                                    time:
-                                        item.updated_at ||
-                                        item.created_at
-                                };
-                            }
-                        );
+                                time:
+                                    item.updated_at ||
+                                    item.created_at
+
+                            });
+
+                        }
+                    );
+
                 }
+
             }
 
-        } catch (error) {
+            catch (error) {
 
-            console.warn(
-                "Unable to load Supabase history:",
-                error
-            );
+                console.error(
+                    "Supabase history error:",
+                    error
+                );
+
+            }
+
         }
 
 
         // -------------------------------------------------------
-        // COMBINE HISTORY
+        // SORT
         // -------------------------------------------------------
 
-        const combinedHistory = [
-
-            ...emergencyHistory,
-
-            ...localHistory
-        ];
-
-
-        // -------------------------------------------------------
-        // REMOVE DUPLICATES
-        // -------------------------------------------------------
-
-        const uniqueHistory =
-            [];
-
-
-        const seen =
-            new Set();
-
-
-        combinedHistory.forEach(
-            function (item) {
-
-                const key =
-                    (
-                        item.status ||
-                        ""
-                    ) +
-                    "|" +
-                    (
-                        item.location ||
-                        ""
-                    ) +
-                    "|" +
-                    (
-                        item.time ||
-                        ""
-                    );
-
-
-                if (
-                    !seen.has(key)
-                ) {
-
-                    seen.add(key);
-
-                    uniqueHistory.push(
-                        item
-                    );
-                }
-            }
-        );
-
-
-        // -------------------------------------------------------
-        // SORT NEWEST FIRST
-        // -------------------------------------------------------
-
-        uniqueHistory.sort(
+        allHistory.sort(
             function (a, b) {
 
-                const dateA =
-                    new Date(
-                        a.time || 0
-                    ).getTime();
+                return (
+                    new Date(b.time || 0) -
+                    new Date(a.time || 0)
+                );
 
-
-                const dateB =
-                    new Date(
-                        b.time || 0
-                    ).getTime();
-
-
-                return dateB - dateA;
             }
         );
 
@@ -1906,33 +1428,28 @@ document.addEventListener("DOMContentLoaded", function () {
         // NO HISTORY
         // -------------------------------------------------------
 
-        if (
-            uniqueHistory.length === 0
-        ) {
+        if (allHistory.length === 0) {
 
             historyList.innerHTML =
                 `
-                <li style="
-                    text-align:center;
-                    padding:20px;
-                ">
-                    📋 No Check-In History Available
+                <li>
+                    📋 No Check-in History Available
                 </li>
                 `;
 
             return;
+
         }
 
 
         // -------------------------------------------------------
-        // DISPLAY HISTORY
+        // DISPLAY
         // -------------------------------------------------------
 
-        historyList.innerHTML =
-            "";
+        historyList.innerHTML = "";
 
 
-        uniqueHistory
+        allHistory
             .slice(0, 30)
             .forEach(
                 function (item) {
@@ -1943,119 +1460,79 @@ document.addEventListener("DOMContentLoaded", function () {
                         );
 
 
-                    li.style.padding =
-                        "15px";
-
-
-                    li.style.marginBottom =
-                        "10px";
-
-
-                    li.style.borderRadius =
-                        "10px";
-
-
-                    li.style.background =
-                        "rgba(255,255,255,0.06)";
-
-
-                    li.style.border =
-                        "1px solid rgba(255,255,255,0.10)";
-
-
-                    const status =
-                        item.status ||
-                        "Unknown";
-
-
-                    const location =
-                        item.location ||
-                        "Unknown";
-
-
-                    const time =
-                        formatDate(
-                            item.time
-                        );
-
-
-                    let icon =
-                        "🟢";
+                    let icon = "🟢";
 
 
                     if (
-                        status
-                            .toUpperCase()
-                            .includes("SOS") ||
-                        status ===
-                            "Emergency Requested"
+                        item.status ===
+                        "Emergency Requested"
                     ) {
 
-                        icon =
-                            "🚨";
+                        icon = "🚨";
 
-                    } else if (
-                        status ===
-                            "Under Review"
+                    }
+
+                    else if (
+                        item.status ===
+                        "Under Review"
                     ) {
 
-                        icon =
-                            "🔎";
+                        icon = "🔎";
 
-                    } else if (
-                        status ===
-                            "Rescue in Progress"
+                    }
+
+                    else if (
+                        item.status ===
+                        "Rescue in Progress"
                     ) {
 
-                        icon =
-                            "🚑";
+                        icon = "🚑";
 
-                    } else if (
-                        status ===
-                            "Resolved"
+                    }
+
+                    else if (
+                        item.status ===
+                        "Resolved"
                     ) {
 
-                        icon =
-                            "✅";
+                        icon = "✅";
+
                     }
 
 
                     li.innerHTML =
                         `
-                        <div>
+                        <strong>
+                            ${icon}
+                            ${escapeHTML(item.status)}
+                        </strong>
 
-                            <strong style="
-                                font-size:16px;
-                            ">
-                                ${icon}
-                                ${escapeHTML(status)}
-                            </strong>
+                        <br>
 
-                            <br>
+                        <span>
+                            📍
+                            ${escapeHTML(
+                                item.location ||
+                                "Unknown"
+                            )}
+                        </span>
 
-                            <span>
-                                📍
-                                ${escapeHTML(location)}
-                            </span>
+                        <br>
 
-                            <br>
-
-                            <small style="
-                                opacity:0.75;
-                            ">
-                                🕒
-                                ${escapeHTML(time)}
-                            </small>
-
-                        </div>
+                        <small>
+                            🕒
+                            ${escapeHTML(
+                                formatDate(item.time)
+                            )}
+                        </small>
                         `;
 
 
-                    historyList.appendChild(
-                        li
-                    );
+                    historyList.appendChild(li);
+
                 }
             );
+
     }
 
 
@@ -2068,31 +1545,27 @@ document.addEventListener("DOMContentLoaded", function () {
         if (!value) {
 
             return "Recently";
+
         }
 
 
-        try {
-
-            const date =
-                new Date(value);
+        const date =
+            new Date(value);
 
 
-            if (
-                isNaN(
-                    date.getTime()
-                )
-            ) {
-
-                return String(value);
-            }
-
-
-            return date.toLocaleString();
-
-        } catch (error) {
+        if (
+            isNaN(
+                date.getTime()
+            )
+        ) {
 
             return String(value);
+
         }
+
+
+        return date.toLocaleString();
+
     }
 
 
@@ -2102,62 +1575,32 @@ document.addEventListener("DOMContentLoaded", function () {
 
     function escapeHTML(value) {
 
-        return String(
-            value ?? ""
-        )
+        return String(value ?? "")
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
 
-            .replace(
-                /&/g,
-                "&amp;"
-            )
-
-            .replace(
-                /</g,
-                "&lt;"
-            )
-
-            .replace(
-                />/g,
-                "&gt;"
-            )
-
-            .replace(
-                /"/g,
-                "&quot;"
-            )
-
-            .replace(
-                /'/g,
-                "&#039;"
-            );
     }
 
 
     // ===========================================================
-    // INITIAL LOAD
+    // INITIAL USER DISPLAY
     // ===========================================================
 
-    loadUser();
+    loadUserInfo();
 
 
-    // -----------------------------------------------------------
-    // DEFAULT TAB = CHECK-IN
-    // -----------------------------------------------------------
+    // ===========================================================
+    // DEFAULT TAB
+    // ===========================================================
 
     showTab("check");
 
 
-    // -----------------------------------------------------------
-    // LOAD STATUS IN BACKGROUND
-    // -----------------------------------------------------------
-
-    loadLatestStatus();
-
-
-    // -----------------------------------------------------------
-    // LOAD HISTORY
-    // -----------------------------------------------------------
-
-    loadHistory();
+    console.log(
+        "CHECK-IN / STATUS / HISTORY initialized successfully"
+    );
 
 });
